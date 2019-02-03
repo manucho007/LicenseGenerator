@@ -1,13 +1,13 @@
 package ru.rtksoftlabs.licensegenerator;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 public class License {
     private LocalDate beginDate;
     private LocalDate endDate;
 
-    private ArrayList<ProtectedObject> protectedObjects;
+    private List<ProtectedObject> protectedObjects;
 
     public License() {
     }
@@ -20,7 +20,7 @@ public class License {
         return endDate;
     }
 
-    public ArrayList<ProtectedObject> getProtectedObjects() {
+    public List<ProtectedObject> getProtectedObjects() {
         return protectedObjects;
     }
 
@@ -32,7 +32,7 @@ public class License {
         this.endDate = endDate;
     }
 
-    public void setProtectedObjects(ArrayList<ProtectedObject> protectedObjects) {
+    public void setProtectedObjects(List<ProtectedObject> protectedObjects) {
         this.protectedObjects = protectedObjects;
     }
 
