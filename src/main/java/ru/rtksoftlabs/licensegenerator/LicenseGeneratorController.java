@@ -27,16 +27,18 @@ public class LicenseGeneratorController {
 
     @PostMapping("/api/generate-license")
     public ResponseEntity<byte[]> generateLicense(@RequestBody License license) throws IOException {
-        return download(licenseService.generateLicense(license));
+        SignedLicenseContainer signedLicenseContainer = licenseService.generateLicense(license);
+
+        return download(signedLicenseContainer);
     }
 
-    private ResponseEntity<byte[]> download(byte[] resource) {
+    private ResponseEntity<byte[]> download(SignedLicenseContainer signedLicenseContainer) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + licenseService.getLicenseFileName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + signedLicenseContainer.getZipFileName());
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(resource);
+                .body(signedLicenseContainer.getZip());
     }
 }

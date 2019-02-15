@@ -2,9 +2,11 @@ package ru.rtksoftlabs.licensegenerator;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +25,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("inno")
 public class LicenseGeneratorControllerTest {
+    @SpyBean
+    private LicenseService licenseService;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,7 +45,11 @@ public class LicenseGeneratorControllerTest {
     }
 
     @Test
-    public void generateLicenseShouldDownloadLicenseFile() throws Exception {
+    public void generateLicenseShouldDownloadZipFile() throws Exception {
+        SignedLicenseContainer signedLicenseContainerTest = new SignedLicenseContainer();
+
+        Mockito.when(licenseService.getNewSignedLicenseContainer()).thenReturn(signedLicenseContainerTest);
+
         License license = new License();
 
         license.setBeginDate(LocalDate.parse("2018-12-27"));
@@ -48,10 +57,12 @@ public class LicenseGeneratorControllerTest {
 
         license.setProtectedObjects(protectedObjectsService.getProtectedObjects());
 
+        SignedLicenseContainer signedLicenseContainer = licenseService.generateLicense(license);
+
         mockMvc.perform(post("/api/generate-license").content("{\"beginDate\":\"2018-12-27\", \"endDate\":\"2018-12-29\", \"protectedObjects\":[{\"name\":\"App1\",\"components\":[\"Component1\",\"Component2\",\"Component3\"]},{\"name\":\"App2\",\"components\":[\"Component1\",\"Component2\",\"Component3\"]}]}").contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, allOf(startsWith("attachment; filename=license_"), endsWith(".lic"))))
-                .andExpect(content().bytes(license.toString().getBytes()))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, allOf(startsWith("attachment; filename=license_"), endsWith(".zip"))))
+                .andExpect(content().bytes(signedLicenseContainer.getZip()))
                 .andExpect(status().isOk());
     }
 }

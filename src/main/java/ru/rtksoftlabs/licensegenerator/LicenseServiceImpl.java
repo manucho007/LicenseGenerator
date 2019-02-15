@@ -1,57 +1,100 @@
 package ru.rtksoftlabs.licensegenerator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.*;
+import java.security.*;
+
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
-@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class LicenseServiceImpl implements LicenseService {
-    private String licenseFileName;
-
     @Value("${license.writetofile}")
-    private boolean isWriteToFile;
+    private boolean isLicenseWriteToFile;
 
-    public LicenseServiceImpl() {
-        this.licenseFileName = generateLicenseFileName();
+    @Value("${signature.writetofile}")
+    private boolean isSignatureWriteToFile;
+
+    @Value("${zip.writetofile}")
+    private boolean isZipWriteToFile;
+
+    @Autowired
+    private SignatureService signatureService;
+
+    @Autowired
+    private FileService fileService;
+
+    private byte[] signLicense(SignedLicenseContainer signedLicenseContainer) {
+        try {
+            Keys keys = signatureService.loadOrCreateKeyStore();
+
+            byte[] signatureBytes = signatureService.sign(signedLicenseContainer.getLicense(), keys.getPrivateKey());
+
+            if (isSignatureWriteToFile) {
+                fileService.save(signatureBytes, signedLicenseContainer.getSignFileName());
+            }
+
+            return signatureBytes;
+        } catch (IOException | GeneralSecurityException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public SignedLicenseContainer getNewSignedLicenseContainer() {
+        return new SignedLicenseContainer();
     }
 
     @Override
-    public byte[] generateLicense(License license) throws IOException {
-        byte[] licenseBytes = license.toString().getBytes();
+    public SignedLicenseContainer generateLicense(License license) {
+        try {
+            SignedLicenseContainer signedLicenseContainer = getNewSignedLicenseContainer();
 
-        if (isWriteToFile) {
-            save(licenseBytes);
+            byte[] licenseBytes = license.toString().getBytes();
+
+            signedLicenseContainer.setLicense(licenseBytes);
+
+            if (isLicenseWriteToFile) {
+                fileService.save(licenseBytes, signedLicenseContainer.getLicenseFileName());
+            }
+
+            byte[] signBytes = signLicense(signedLicenseContainer);
+
+            signedLicenseContainer.setSign(signBytes);
+
+            return zipLicense(signedLicenseContainer);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private SignedLicenseContainer zipLicense(SignedLicenseContainer signedLicenseContainer) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
+
+        for (Map.Entry<String, byte[]> elem : signedLicenseContainer) {
+            ZipEntry entry = new ZipEntry(elem.getKey());
+            entry.setSize(elem.getValue().length);
+            zos.putNextEntry(entry);
+            zos.write(elem.getValue());
         }
 
-        return licenseBytes;
-    }
+        zos.closeEntry();
+        zos.close();
 
-    @Override
-    public String generateLicenseFileName() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS");
+        byte[] zipBytes = baos.toByteArray();
 
-        String licenseFileName = "license_" + LocalDateTime.now().format(formatter) + ".lic";
+        if (isZipWriteToFile) {
+            fileService.save(zipBytes, signedLicenseContainer.getZipFileName());
+        }
 
-        return licenseFileName;
-    }
+        signedLicenseContainer.setZip(zipBytes);
 
-    @Override
-    public void save(byte[] license) throws IOException {
-        Path path = Paths.get(licenseFileName);
-        Files.write(path, license);
-    }
-
-    @Override
-    public String getLicenseFileName() {
-        return licenseFileName;
+        return signedLicenseContainer;
     }
 }
