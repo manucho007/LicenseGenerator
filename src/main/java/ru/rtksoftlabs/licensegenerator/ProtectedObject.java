@@ -1,15 +1,15 @@
 package ru.rtksoftlabs.licensegenerator;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 public class ProtectedObject {
     private String name;
-    private ArrayList<String> components;
+    private Map<String, String> components;
 
     public ProtectedObject() {
     }
 
-    public ProtectedObject(String name, ArrayList<String> components) {
+    public ProtectedObject(String name, Map<String, String> components) {
         this.name = name;
         this.components = components;
     }
@@ -18,7 +18,7 @@ public class ProtectedObject {
         return name;
     }
 
-    public ArrayList<String> getComponents() {
+    public Map<String, String> getComponents() {
         return components;
     }
 
