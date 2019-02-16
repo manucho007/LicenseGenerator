@@ -1,11 +1,11 @@
 package ru.rtksoftlabs.licensegenerator;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.security.*;
@@ -17,6 +17,9 @@ import java.security.spec.X509EncodedKeySpec;
 public class SignatureServiceTest {
     @Autowired
     private SignatureService signatureService;
+
+    @MockBean
+    FileService fileService;
 
     @Test
     public void verifyShouldReturnTrueWhenSignedMessageWasNotModifiedAfterSign() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {

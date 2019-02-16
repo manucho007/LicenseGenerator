@@ -91,7 +91,16 @@ public class SignatureServiceImpl implements SignatureService {
         return verify(signature, messageBytes, signatureBytes);
     }
 
-    private X509Certificate generateCertificate(String dn, KeyPair keyPair, int validity, String sigAlgName) throws GeneralSecurityException, IOException {
+    @Override
+    public boolean verify(byte[] messageBytes, byte[] signatureBytes, Certificate certificate) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = createSignature();
+
+        signature.initVerify(certificate);
+
+        return verify(signature, messageBytes, signatureBytes);
+    }
+
+    public X509Certificate generateCertificate(String dn, KeyPair keyPair, int validity, String sigAlgName) throws GeneralSecurityException, IOException {
         PrivateKey privateKey = keyPair.getPrivate();
 
         X509CertInfo info = new X509CertInfo();
@@ -123,17 +132,24 @@ public class SignatureServiceImpl implements SignatureService {
         return certificate;
     }
 
+    public Certificate loadCertificate() throws IOException, CertificateException {
+        FileInputStream inStream = fileService.loadInputStream(keyCertificateName);
+        CertificateFactory cf = CertificateFactory.getInstance(keyCertificateType);
+
+        return cf.generateCertificate(inStream);
+    }
+
     private Keys loadKeyStore(String keystoreFileName) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         try {
             Certificate cert;
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream fis = new FileInputStream(keystoreFileName);
+            InputStream fis = fileService.loadInputStream(keystoreFileName);
             keyStore.load(fis, keyStorePassword.toCharArray());
 
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAliasName, keyPassword.toCharArray());
 
             if (Files.exists(Paths.get(keyCertificateName))) {
-                FileInputStream inStream = new FileInputStream(keyCertificateName);
+                FileInputStream inStream = fileService.loadInputStream(keyCertificateName);
                 CertificateFactory cf = CertificateFactory.getInstance(keyCertificateType);
                 cert = cf.generateCertificate(inStream);
             } else {
@@ -144,36 +160,38 @@ public class SignatureServiceImpl implements SignatureService {
             return new Keys(privateKey, cert);
         }
         catch (IOException | GeneralSecurityException e) {
-            e.printStackTrace();
-            throw e;
+            throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public KeyStore getKeyStoreWithCertificate(KeyPair keyPair) throws GeneralSecurityException, IOException {
+        Certificate[] chain = {generateCertificate("cn=" + keyCertificateCN, keyPair, keyCertificateValidityDays, keyAlgName)};
+
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keyStore.load(null, null);
+        keyStore.setKeyEntry(keyAliasName, keyPair.getPrivate(), keyPassword.toCharArray(), chain);
+
+        return keyStore;
     }
 
     private Keys createKeyStore(String keystoreFileName) throws GeneralSecurityException, IOException {
         try {
-            Certificate cert = null;
-
-            FileOutputStream fos;
-
-            fos = new FileOutputStream(keystoreFileName);
+            Certificate cert;
 
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(keyPairGeneratorType);
             keyPairGenerator.initialize(keySize);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
             PrivateKey privateKey = keyPair.getPrivate();
-
-            Certificate[] chain = {generateCertificate("cn=" + keyCertificateCN, keyPair, keyCertificateValidityDays, keyAlgName)};
-
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(null, null);
-            keyStore.setKeyEntry(keyAliasName, keyPair.getPrivate(), keyPassword.toCharArray(), chain);
+            KeyStore keyStore = getKeyStoreWithCertificate(keyPair);
 
             cert = keyStore.getCertificate(keyAliasName);
 
             byte[] certBytes = cert.getEncoded();
 
             fileService.save(certBytes, keyCertificateName);
+
+            FileOutputStream fos = fileService.saveOutputStream(keystoreFileName);
 
             keyStore.store(fos, keyStorePassword.toCharArray());
 
@@ -192,5 +210,9 @@ public class SignatureServiceImpl implements SignatureService {
         else {
             return loadKeyStore(keyStoreName);
         }
+    }
+
+    public String getKeyAliasName() {
+        return keyAliasName;
     }
 }

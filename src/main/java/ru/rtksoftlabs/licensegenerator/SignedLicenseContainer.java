@@ -39,8 +39,16 @@ public class SignedLicenseContainer implements Iterable<Map.Entry<String, byte[]
         this.zip = zip;
     }
 
+    public void setZipFileName(String zipFileName) {
+        this.zipFileName = zipFileName;
+    }
+
     public byte[] getZip() {
         return zip;
+    }
+
+    public byte[] getSign() {
+        return sign;
     }
 
     @Override

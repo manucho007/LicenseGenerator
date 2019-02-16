@@ -7,10 +7,6 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.security.*;
 
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 @Service
 public class LicenseServiceImpl implements LicenseService {
     @Value("${license.writetofile}")
@@ -27,6 +23,9 @@ public class LicenseServiceImpl implements LicenseService {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private ZipLicenseService zipLicenseService;
 
     private byte[] signLicense(SignedLicenseContainer signedLicenseContainer) {
         try {
@@ -54,7 +53,7 @@ public class LicenseServiceImpl implements LicenseService {
         try {
             SignedLicenseContainer signedLicenseContainer = getNewSignedLicenseContainer();
 
-            byte[] licenseBytes = license.toString().getBytes();
+            byte[] licenseBytes = license.toJson().getBytes();
 
             signedLicenseContainer.setLicense(licenseBytes);
 
@@ -66,35 +65,16 @@ public class LicenseServiceImpl implements LicenseService {
 
             signedLicenseContainer.setSign(signBytes);
 
-            return zipLicense(signedLicenseContainer);
+            zipLicenseService.zipLicense(signedLicenseContainer);
+
+            if (isZipWriteToFile) {
+                fileService.save(signedLicenseContainer.getZip(), signedLicenseContainer.getZipFileName());
+            }
+
+            return signedLicenseContainer;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
-    }
-
-    private SignedLicenseContainer zipLicense(SignedLicenseContainer signedLicenseContainer) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zos = new ZipOutputStream(baos);
-
-        for (Map.Entry<String, byte[]> elem : signedLicenseContainer) {
-            ZipEntry entry = new ZipEntry(elem.getKey());
-            entry.setSize(elem.getValue().length);
-            zos.putNextEntry(entry);
-            zos.write(elem.getValue());
-        }
-
-        zos.closeEntry();
-        zos.close();
-
-        byte[] zipBytes = baos.toByteArray();
-
-        if (isZipWriteToFile) {
-            fileService.save(zipBytes, signedLicenseContainer.getZipFileName());
-        }
-
-        signedLicenseContainer.setZip(zipBytes);
-
-        return signedLicenseContainer;
     }
 }
