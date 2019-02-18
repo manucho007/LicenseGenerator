@@ -4,15 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class LicenseGeneratorController {
     @Autowired
     private ProtectedObjectsService protectedObjectsService;
@@ -20,12 +18,12 @@ public class LicenseGeneratorController {
     @Autowired
     private LicenseService licenseService;
 
-    @GetMapping("/api/protected-objects")
+    @GetMapping("/protected-objects")
     public List<ProtectedObject> getProtectedObjects() {
         return protectedObjectsService.getProtectedObjects();
     }
 
-    @PostMapping("/api/generate-license")
+    @PostMapping("/generate-license")
     public ResponseEntity<byte[]> generateLicense(@RequestBody License license) throws IOException {
         SignedLicenseContainer signedLicenseContainer = licenseService.generateLicense(license);
 
