@@ -1,32 +1,62 @@
 package ru.rtksoftlabs.licensegenerator;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ProtectedObject {
-    private String name;
-    private Map<String, String> components;
+    private List<String> listOfStringsWithPathToAllLeafs;
+
+    public String data;
+
+    private ProtectedObject parent;
+
+    public List<ProtectedObject> children;
 
     public ProtectedObject() {
     }
 
-    public ProtectedObject(String name, Map<String, String> components) {
-        this.name = name;
-        this.components = components;
+    public ProtectedObject(String data) {
+        this.data = data;
+        this.children = new LinkedList<>();
     }
 
-    public String getName() {
-        return name;
+    public ProtectedObject addChild(String child) {
+        ProtectedObject childNode = new ProtectedObject(child);
+        childNode.parent = this;
+        this.children.add(childNode);
+        return childNode;
     }
 
-    public Map<String, String> getComponents() {
-        return components;
+    public List<String> generateListOfAllPathsToLeafs(ProtectedObject node, String accumulator) {
+        listOfStringsWithPathToAllLeafs = new ArrayList<>();
+
+        for (ProtectedObject child: node.children) {
+            String elem = accumulator;
+            elem += "/" + child.data;
+
+            if ((child.children != null) && (child.children.size() > 0)) {
+                generateListOfAllPathsToLeafs(child, elem);
+            } else {
+                listOfStringsWithPathToAllLeafs.add(elem);
+            }
+        }
+
+        return listOfStringsWithPathToAllLeafs;
     }
 
-    @Override
-    public String toString() {
-        return "ProtectedObject{" +
-                "name='" + name + '\'' +
-                ", components=" + components +
-                '}';
+    public List<String> returnListOfStringsWithPathToAllLeafs() {
+        if (listOfStringsWithPathToAllLeafs == null) {
+            generateListOfAllPathsToLeafs(this, data);
+        }
+
+        return listOfStringsWithPathToAllLeafs;
+    }
+
+    public boolean find(ProtectedObject protectedObject) {
+        List<String> otherList = protectedObject.returnListOfStringsWithPathToAllLeafs();
+
+        return returnListOfStringsWithPathToAllLeafs().containsAll(otherList);
     }
 }
+

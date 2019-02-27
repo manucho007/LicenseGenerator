@@ -6,9 +6,7 @@ import ru.rtksoftlabs.licensegenerator.ProtectedObject;
 import ru.rtksoftlabs.licensegenerator.ProtectedObjectsService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Profile("inno")
@@ -17,14 +15,19 @@ public class ProtectedObjectsServiceImpl implements ProtectedObjectsService {
     public List<ProtectedObject> getProtectedObjects() {
         List<ProtectedObject> protectedObjects = new ArrayList<>();
 
-        Map<String, String> components = new HashMap<>();
+        ProtectedObject protectedObject1 = new ProtectedObject("App1");
+        ProtectedObject protectedObject2 = new ProtectedObject("App2");
 
-        components.put("idComponent1", "nameComponent1");
-        components.put("idComponent2", "nameComponent2");
-        components.put("idComponent3", "nameComponent3");
+        ProtectedObject child = protectedObject1.addChild("Scripts");
 
-        protectedObjects.add(new ProtectedObject("App1", components));
-        protectedObjects.add(new ProtectedObject("App2", components));
+        child.addChild("sc1");
+        child.addChild("sc2");
+        child.addChild("sc3");
+
+        protectedObject1.addChild("Roles");
+
+        protectedObjects.add(protectedObject1);
+        protectedObjects.add(protectedObject2);
 
         return protectedObjects;
     }

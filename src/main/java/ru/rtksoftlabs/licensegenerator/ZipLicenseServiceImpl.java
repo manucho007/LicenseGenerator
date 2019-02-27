@@ -43,12 +43,24 @@ public class ZipLicenseServiceImpl implements ZipLicenseService {
         while ((entry = zis.getNextEntry()) != null) {
             name = entry.getName();
 
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            byte[] contents = new byte[4096];
+
+            int direct;
+
+            while ((direct = zis.read(contents, 0, contents.length)) > 0) {
+                baos.write(contents, 0, direct);
+            }
+
             if (name.endsWith(".lic")) {
-                signedLicenseContainer.setLicense(zis.readAllBytes());
+                signedLicenseContainer.setLicense(baos.toByteArray());
             }
             else if (name.endsWith(".sign")) {
-                signedLicenseContainer.setSign(zis.readAllBytes());
+                signedLicenseContainer.setSign(baos.toByteArray());
             }
+
+            baos.close();
 
             zis.closeEntry();
         }
