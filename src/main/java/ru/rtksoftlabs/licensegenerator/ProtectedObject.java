@@ -3,6 +3,7 @@ package ru.rtksoftlabs.licensegenerator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class ProtectedObject {
     private List<String> listOfStringsWithPathToAllLeafs;
@@ -57,6 +58,15 @@ public class ProtectedObject {
         List<String> otherList = protectedObject.returnListOfStringsWithPathToAllLeafs();
 
         return returnListOfStringsWithPathToAllLeafs().containsAll(otherList);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProtectedObject that = (ProtectedObject) o;
+        return Objects.equals(data, that.data) &&
+                Objects.equals(children, that.children);
     }
 }
 
