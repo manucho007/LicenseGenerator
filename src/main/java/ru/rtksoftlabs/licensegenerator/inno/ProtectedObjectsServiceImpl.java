@@ -31,4 +31,9 @@ public class ProtectedObjectsServiceImpl implements ProtectedObjectsService {
 
         return protectedObjects;
     }
+
+    @Override
+    public void updateProtectedObjects() {
+
+    }
 }

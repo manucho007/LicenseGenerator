@@ -4,21 +4,21 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.netty.channel.ConnectTimeoutException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import ru.rtksoftlabs.licensegenerator.config.ConfigUrlsForProtectedObjects;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +55,7 @@ public class ProtectedObjectsDataTest {
     }
 
     private void PrepareResponses(int count) throws IOException {
-        int port = 8083;
+        int port = 8191;
 
         for (int i = 0; i < count; i++) {
             String preparedContent = prepareContent(i);
@@ -93,6 +93,8 @@ public class ProtectedObjectsDataTest {
 
         List<List<ProtectedObject>> preparedContentList = new ArrayList<>();
 
+        AtomicInteger sizeOfSuccessRequests = new AtomicInteger(monosList.size());
+
         for (Map.Entry<String, Mono<List<ProtectedObject>>> result: monosList.entrySet()) {
             String preparedContent = prepareContent(i++);
 
@@ -100,16 +102,29 @@ public class ProtectedObjectsDataTest {
 
             preparedContentList.add(expectedContent);
 
-            StepVerifier.create(result.getValue())
-                    .consumeNextWith(
-                            responseContent -> {
-                                assertThat(responseContent).usingFieldByFieldElementComparator().isEqualTo(expectedContent);
-                                protectedObjectsData.addToMap(result.getKey(), responseContent);
-                            })
-                    .expectComplete().verify();
+            if (result.getKey().equals("source9")) {
+                StepVerifier.create(result.getValue())
+                        .expectErrorSatisfies(throwable -> {
+                                assertThat(throwable).isInstanceOf(ConnectTimeoutException.class);
+                                assertThat(throwable.getMessage()).isEqualTo("connection timed out: /192.168.24.1:500");
+
+                                sizeOfSuccessRequests.getAndDecrement();
+                        })
+                        .verify();
+            }
+            else {
+                StepVerifier.create(result.getValue())
+                        .consumeNextWith(
+                                responseContent -> {
+                                    assertThat(responseContent).usingFieldByFieldElementComparator().isEqualTo(expectedContent);
+
+                                    protectedObjectsData.addToMap(result.getKey(), responseContent);
+                                })
+                        .expectComplete().verify();
+            }
         }
 
-        assertThat(protectedObjectsData.getProtectedObjects()).size().isEqualTo(monosList.size());
+        assertThat(protectedObjectsData.getProtectedObjects()).size().isEqualTo(sizeOfSuccessRequests.get());
 
         i = 0;
 
@@ -118,29 +133,5 @@ public class ProtectedObjectsDataTest {
         for (Map.Entry<String, List<ProtectedObject>> entry: protectedObjects.entrySet()) {
             assertThat(entry.getValue()).usingFieldByFieldElementComparator().isEqualTo(preparedContentList.get(i++));
         }
-
-        // TODO удалить! и брэйкпоинт тоже
-        // Возвращаем другой контент к существующему ключу, чтобы проверить вызов add у map с защищаемыми объектами
-
-        Map.Entry<String, Mono<List<ProtectedObject>>> entry = ((TreeMap<String, Mono<List<ProtectedObject>>>) monosList).lastEntry();
-
-        Mono<List<ProtectedObject>> monoRequest = entry.getValue();
-
-        String preparedContent = prepareContent(2);
-
-        List<ProtectedObject> expectedContent = mapper.readValue(preparedContent, new TypeReference<List<ProtectedObject>>(){});
-
-        prepareResponse(mockWebServerList.get(mockWebServerList.size() - 1), response -> response
-                .setHeader("Content-Type", "application/json")
-                .setResponseCode(200)
-                .setBody(preparedContent));
-
-        StepVerifier.create(monoRequest)
-                .consumeNextWith(
-                        responseContent -> {
-                            assertThat(responseContent).usingFieldByFieldElementComparator().isEqualTo(expectedContent);
-                            protectedObjectsData.addToMap(entry.getKey(), responseContent);
-                        })
-                .expectComplete().verify();
     }
 }
