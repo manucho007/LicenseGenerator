@@ -1,4 +1,4 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.rtksoftlabs.licensegenerator.services.FileService;
+import ru.rtksoftlabs.licensegenerator.services.SignatureService;
 
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;

@@ -1,6 +1,7 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.services;
 
-import java.io.FileNotFoundException;
+import ru.rtksoftlabs.licensegenerator.util.Keys;
+
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;

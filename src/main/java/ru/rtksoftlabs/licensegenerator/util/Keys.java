@@ -1,4 +1,4 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.util;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;

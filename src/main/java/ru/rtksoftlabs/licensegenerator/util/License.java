@@ -1,10 +1,11 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
 
 import java.time.LocalDate;
 import java.util.List;

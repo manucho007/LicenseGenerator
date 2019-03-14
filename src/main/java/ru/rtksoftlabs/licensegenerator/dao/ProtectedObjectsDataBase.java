@@ -1,9 +1,10 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
 import ru.rtksoftlabs.licensegenerator.config.ConfigUrlsForProtectedObjects;
 
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.services;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

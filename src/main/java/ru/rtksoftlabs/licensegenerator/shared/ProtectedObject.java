@@ -1,4 +1,4 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.shared;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

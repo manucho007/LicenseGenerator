@@ -1,4 +1,4 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.dao;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

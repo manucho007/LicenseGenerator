@@ -1,10 +1,15 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import ru.rtksoftlabs.licensegenerator.services.LicenseService;
+import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
+import ru.rtksoftlabs.licensegenerator.services.ProtectedObjectsService;
+import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
+import ru.rtksoftlabs.licensegenerator.util.License;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,8 +1,10 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
+import ru.rtksoftlabs.licensegenerator.dao.ProtectedObjectsData;
 
 import java.util.ArrayList;
 import java.util.Collections;

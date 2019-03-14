@@ -1,6 +1,7 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.services;
 
 import org.springframework.stereotype.Service;
+import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

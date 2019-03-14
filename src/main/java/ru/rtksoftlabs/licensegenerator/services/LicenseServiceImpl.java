@@ -1,8 +1,11 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
+import ru.rtksoftlabs.licensegenerator.util.Keys;
+import ru.rtksoftlabs.licensegenerator.util.License;
 
 import java.io.*;
 import java.security.*;

@@ -1,6 +1,7 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.services;
 
 import org.springframework.stereotype.Service;
+import ru.rtksoftlabs.licensegenerator.services.FileService;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

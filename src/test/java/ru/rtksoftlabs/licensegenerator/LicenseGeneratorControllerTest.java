@@ -18,6 +18,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.rtksoftlabs.licensegenerator.services.FileService;
+import ru.rtksoftlabs.licensegenerator.services.LicenseService;
+import ru.rtksoftlabs.licensegenerator.services.ProtectedObjectsService;
+import ru.rtksoftlabs.licensegenerator.services.SignatureService;
+import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
+import ru.rtksoftlabs.licensegenerator.util.Keys;
+import ru.rtksoftlabs.licensegenerator.util.License;
+import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
 
 import java.security.KeyPair;
 import java.security.KeyStore;

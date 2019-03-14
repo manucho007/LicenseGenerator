@@ -15,6 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import ru.rtksoftlabs.licensegenerator.dao.ProtectedObjectsData;
+import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
 
 import java.io.IOException;
 import java.util.*;

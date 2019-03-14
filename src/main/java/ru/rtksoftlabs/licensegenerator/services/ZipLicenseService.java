@@ -1,4 +1,6 @@
-package ru.rtksoftlabs.licensegenerator;
+package ru.rtksoftlabs.licensegenerator.services;
+
+import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
 
 import java.io.IOException;
 
