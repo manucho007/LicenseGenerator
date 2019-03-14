@@ -13,13 +13,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 
+import java.util.concurrent.TimeUnit;
+
 @SpringBootApplication
 public class LicensegeneratorApplication {
-    @Value("${webclient.connection.timeout.millis}")
-    private int connectionTimeoutMillis;
+    @Value("${webclient.connection.timeout}")
+    private int connectionTimeout;
 
-    @Value("${webclient.read.timeout.sec}")
-    private int readTimeoutSeconds;
+    @Value("${webclient.read.timeout}")
+    private int readTimeout;
 
     public static void main(String[] args) {
         SpringApplication.run(LicensegeneratorApplication.class, args);
@@ -33,9 +35,9 @@ public class LicensegeneratorApplication {
     @Bean
     public WebClient webClient() {
         TcpClient tcpClient = TcpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout)
                 .doOnConnected(connection ->
-                        connection.addHandlerLast(new ReadTimeoutHandler(readTimeoutSeconds)));
+                        connection.addHandlerLast(new ReadTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS)));
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
