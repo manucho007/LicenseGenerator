@@ -102,7 +102,7 @@ public class ProtectedObjectsDataTest {
 
             preparedContentList.add(expectedContent);
 
-            if (result.getKey().equals("source9")) {
+            if (result.getKey().equals("unavailable")) {
                 StepVerifier.create(result.getValue())
                         .expectErrorSatisfies(throwable -> {
                                 assertThat(throwable).isInstanceOf(ConnectTimeoutException.class);
