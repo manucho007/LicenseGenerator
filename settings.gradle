@@ -1,1 +1,3 @@
+include 'rtk-frontend'
+
 rootProject.name = 'licensegenerator'

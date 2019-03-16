@@ -37,6 +37,14 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.13.1'
 }
 
+processResources {
+    from ("${project(':rtk-frontend').projectDir}/dist/${project(':rtk-frontend').name}") {
+        into 'static'
+    }
+}
+
+processResources.dependsOn('rtk-frontend:build')
+
 bootRun {
     String activeProfile = System.properties['spring.profiles.active']
     systemProperty "spring.profiles.active", activeProfile
