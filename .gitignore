@@ -24,6 +24,9 @@
 *.ipr
 /out/
 
+### VSCODE ###
+/.vscode/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
