@@ -28,33 +28,20 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
 
     public void addToMap(String key, List<ProtectedObject> list) {
         if((!protectedObjects.containsKey(key)) || (!protectedObjects.get(key).equals(list))) {
-            System.out.println("protectedObjects.put");
             protectedObjects.put(key, list);
         }
     }
 
     public void processRequests(Map<String, Mono<List<ProtectedObject>>> requests) {
-        System.out.println("Before processRequests!");
-
         for (Map.Entry<String, Mono<List<ProtectedObject>>> request: requests.entrySet()) {
             request.getValue().subscribe(p -> {
-                        System.out.println("Protected Objects in processRequests, source: " + request.getKey());
-
-                        for (ProtectedObject protectedObject: p){
-                            System.out.println(protectedObject);
-                        }
-
                         addToMap(request.getKey(), p);
                     },
                     e -> {
                         // TODO удалять из мапа protected objects?
-                        System.out.println("Exception in processRequests, source: " + request.getKey() + ", exception: " + e);
-                        //e.printStackTrace();
                         throw new RuntimeException(e);
                     });
         }
-
-        System.out.println("After processRequests!");
     }
 
     @Override
