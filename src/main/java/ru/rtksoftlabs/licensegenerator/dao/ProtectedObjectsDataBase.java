@@ -38,7 +38,8 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
                         addToMap(request.getKey(), p);
                     },
                     e -> {
-                        // TODO удалять из мапа protected objects?
+                        protectedObjects.remove(request.getKey());
+
                         throw new RuntimeException(e);
                     });
         }
