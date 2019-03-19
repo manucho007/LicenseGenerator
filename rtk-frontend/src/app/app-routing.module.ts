@@ -5,7 +5,9 @@ import { ViewerComponent } from './license/viewer/viewer.component';
 
 const routes: Routes = [
   { path: 'generator', component: GeneratorComponent },
-  { path: 'viewer', component: ViewerComponent}
+  { path: 'viewer', component: ViewerComponent},
+  { path: '', component: GeneratorComponent }
+
 ];
 
 @NgModule({
