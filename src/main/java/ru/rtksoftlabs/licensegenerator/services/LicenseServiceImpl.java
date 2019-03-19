@@ -42,7 +42,7 @@ public class LicenseServiceImpl implements LicenseService {
 
             return signatureBytes;
         } catch (IOException | GeneralSecurityException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -75,7 +75,7 @@ public class LicenseServiceImpl implements LicenseService {
 
             return signedLicenseContainer;
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

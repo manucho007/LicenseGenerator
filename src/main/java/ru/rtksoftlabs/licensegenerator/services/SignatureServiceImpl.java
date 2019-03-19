@@ -161,7 +161,7 @@ public class SignatureServiceImpl implements SignatureService {
             return new Keys(privateKey, cert);
         }
         catch (IOException | GeneralSecurityException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
