@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 @Component
-@Profile("default")
+@Profile("!inno")
 public class ProtectedObjectsDataImpl extends ProtectedObjectsDataBase {
     @PostConstruct
     private void init() {

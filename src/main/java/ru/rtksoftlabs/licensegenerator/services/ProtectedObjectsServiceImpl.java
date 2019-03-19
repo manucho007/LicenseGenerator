@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-@Profile("default")
+@Profile("!inno")
 public class ProtectedObjectsServiceImpl implements ProtectedObjectsService {
     @Autowired
     private ProtectedObjectsData protectedObjectsData;
