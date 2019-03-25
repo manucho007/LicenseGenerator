@@ -56,3 +56,7 @@ bootRun {
     String activeProfile = System.properties['spring.profiles.active']
     systemProperty "spring.profiles.active", activeProfile
 }
+
+jacoco {
+    toolVersion = "0.8.3"
+}
