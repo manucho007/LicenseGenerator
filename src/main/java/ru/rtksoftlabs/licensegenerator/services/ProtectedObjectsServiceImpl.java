@@ -25,7 +25,7 @@ public class ProtectedObjectsServiceImpl implements ProtectedObjectsService {
             returnProtectedObjects.addAll(protectedObjects);
         }
 
-        Collections.sort(returnProtectedObjects, Comparator.comparing(p -> p.data));
+        Collections.sort(returnProtectedObjects, Comparator.comparing(ProtectedObject::getData));
 
         return returnProtectedObjects;
     }

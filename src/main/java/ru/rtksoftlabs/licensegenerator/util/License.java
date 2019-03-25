@@ -17,6 +17,7 @@ public class License {
     private List<ProtectedObject> protectedObjects;
 
     public License() {
+        // That constructor needed for jackson mapping
     }
 
     public LocalDate getBeginDate() {

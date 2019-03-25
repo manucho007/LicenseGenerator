@@ -8,7 +8,6 @@ import sun.security.x509.*;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
@@ -140,29 +139,24 @@ public class SignatureServiceImpl implements SignatureService {
         return cf.generateCertificate(inStream);
     }
 
-    private Keys loadKeyStore(String keystoreFileName) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        try {
-            Certificate cert;
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream fis = fileService.loadInputStream(keystoreFileName);
-            keyStore.load(fis, keyStorePassword.toCharArray());
+    private Keys loadKeyStore(String keystoreFileName) throws GeneralSecurityException, IOException {
+        Certificate cert;
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        InputStream fis = fileService.loadInputStream(keystoreFileName);
+        keyStore.load(fis, keyStorePassword.toCharArray());
 
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAliasName, keyPassword.toCharArray());
+        PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAliasName, keyPassword.toCharArray());
 
-            if (Files.exists(Paths.get(keyCertificateName))) {
-                FileInputStream inStream = fileService.loadInputStream(keyCertificateName);
-                CertificateFactory cf = CertificateFactory.getInstance(keyCertificateType);
-                cert = cf.generateCertificate(inStream);
-            } else {
-                cert = keyStore.getCertificate(keyAliasName);
-                fileService.save(cert.getEncoded(), keyCertificateName);
-            }
-
-            return new Keys(privateKey, cert);
+        if (Paths.get(keyCertificateName).toFile().exists()) {
+            FileInputStream inStream = fileService.loadInputStream(keyCertificateName);
+            CertificateFactory cf = CertificateFactory.getInstance(keyCertificateType);
+            cert = cf.generateCertificate(inStream);
+        } else {
+            cert = keyStore.getCertificate(keyAliasName);
+            fileService.save(cert.getEncoded(), keyCertificateName);
         }
-        catch (IOException | GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
+
+        return new Keys(privateKey, cert);
     }
 
     public KeyStore getKeyStoreWithCertificate(KeyPair keyPair) throws GeneralSecurityException, IOException {
@@ -176,39 +170,34 @@ public class SignatureServiceImpl implements SignatureService {
     }
 
     private Keys createKeyStore(String keystoreFileName) throws GeneralSecurityException, IOException {
-        try {
-            Certificate cert;
+        Certificate cert;
 
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(keyPairGeneratorType);
-            keyPairGenerator.initialize(keySize);
-            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(keyPairGeneratorType);
+        keyPairGenerator.initialize(keySize);
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-            PrivateKey privateKey = keyPair.getPrivate();
-            KeyStore keyStore = getKeyStoreWithCertificate(keyPair);
+        PrivateKey privateKey = keyPair.getPrivate();
+        KeyStore keyStore = getKeyStoreWithCertificate(keyPair);
 
-            cert = keyStore.getCertificate(keyAliasName);
+        cert = keyStore.getCertificate(keyAliasName);
 
-            byte[] certBytes = cert.getEncoded();
+        byte[] certBytes = cert.getEncoded();
 
-            fileService.save(certBytes, keyCertificateName);
+        fileService.save(certBytes, keyCertificateName);
 
-            FileOutputStream fos = fileService.saveOutputStream(keystoreFileName);
+        FileOutputStream fos = fileService.saveOutputStream(keystoreFileName);
 
-            keyStore.store(fos, keyStorePassword.toCharArray());
+        keyStore.store(fos, keyStorePassword.toCharArray());
 
-            return new Keys(privateKey, cert);
-        }
-        catch (IOException | GeneralSecurityException e) {
-            throw e;
-        }
+        return new Keys(privateKey, cert);
     }
 
     public Keys loadOrCreateKeyStore() throws GeneralSecurityException, IOException {
-        if (Files.notExists(Paths.get(keyStoreName))) {
-            return createKeyStore(keyStoreName);
+        if (Paths.get(keyStoreName).toFile().exists()) {
+            return loadKeyStore(keyStoreName);
         }
         else {
-            return loadKeyStore(keyStoreName);
+            return createKeyStore(keyStoreName);
         }
     }
 

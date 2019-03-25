@@ -29,14 +29,14 @@ public class LicenseGeneratorController {
     }
 
     @PutMapping("/update-protected-objects")
-    public ResponseEntity<?> updateProtectedObjectsList() {
+    public ResponseEntity<Void> updateProtectedObjectsList() {
         protectedObjectsService.updateProtectedObjects();
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/generate-license")
-    public ResponseEntity<byte[]> generateLicense(@RequestBody License license) throws IOException {
+    public ResponseEntity<byte[]> generateLicense(@RequestBody License license) {
         SignedLicenseContainer signedLicenseContainer = licenseService.generateLicense(license);
 
         return download(signedLicenseContainer);

@@ -34,6 +34,6 @@ public class ProtectedObjectsServiceImpl implements ProtectedObjectsService {
 
     @Override
     public void updateProtectedObjects() {
-
+        // In that profile not needed to implement
     }
 }

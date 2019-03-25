@@ -1,5 +1,6 @@
 package ru.rtksoftlabs.licensegenerator.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@Slf4j
 public class ProtectedObjectsDataBase implements ProtectedObjectsData {
     @Autowired
     private WebClient webClient;
@@ -34,13 +36,11 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
 
     public void processRequests(Map<String, Mono<List<ProtectedObject>>> requests) {
         for (Map.Entry<String, Mono<List<ProtectedObject>>> request: requests.entrySet()) {
-            request.getValue().subscribe(p -> {
-                        addToMap(request.getKey(), p);
-                    },
+            request.getValue().subscribe(p -> addToMap(request.getKey(), p),
                     e -> {
                         protectedObjects.remove(request.getKey());
 
-                        throw new RuntimeException(e);
+                        log.error("Request to " + request.getKey() + ": " + request.getValue() + " failed", e);
                     });
         }
     }

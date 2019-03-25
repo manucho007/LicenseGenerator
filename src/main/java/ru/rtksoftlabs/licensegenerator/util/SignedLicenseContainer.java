@@ -62,9 +62,7 @@ public class SignedLicenseContainer implements Iterable<Map.Entry<String, byte[]
     public String generateFileName() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS");
 
-        String fileName = "license_" + LocalDateTime.now().format(formatter);
-
-        return fileName;
+        return "license_" + LocalDateTime.now().format(formatter);
     }
 
     public String generateLicenseFileName() {

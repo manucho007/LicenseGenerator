@@ -3,6 +3,8 @@ package ru.rtksoftlabs.licensegenerator.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.rtksoftlabs.licensegenerator.exceptions.GenerateLicenseException;
+import ru.rtksoftlabs.licensegenerator.exceptions.SignLicenseException;
 import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
 import ru.rtksoftlabs.licensegenerator.util.Keys;
 import ru.rtksoftlabs.licensegenerator.util.License;
@@ -42,7 +44,7 @@ public class LicenseServiceImpl implements LicenseService {
 
             return signatureBytes;
         } catch (IOException | GeneralSecurityException e) {
-            throw new RuntimeException(e);
+            throw new SignLicenseException("Signing license failed", e);
         }
     }
 
@@ -75,7 +77,7 @@ public class LicenseServiceImpl implements LicenseService {
 
             return signedLicenseContainer;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new GenerateLicenseException("Generating license failed", e);
         }
     }
 }
