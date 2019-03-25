@@ -1,29 +1,58 @@
 package ru.rtksoftlabs.licensegenerator.shared;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ProtectedObject {
     private List<String> listOfStringsWithPathToAllLeafs;
 
-    public String data;
+    private String data;
 
-    public List<ProtectedObject> children;
+    private Set<ProtectedObject> children;
 
     public ProtectedObject() {
     }
 
     public ProtectedObject(String data) {
         this.data = data;
-        this.children = new LinkedList<>();
+        this.children = new LinkedHashSet<>();
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public Set<ProtectedObject> getChildren() {
+        return children;
     }
 
     public ProtectedObject addChild(String child) {
         ProtectedObject childNode = new ProtectedObject(child);
-        this.children.add(childNode);
+
+        if (!this.children.add(childNode)) {
+            ProtectedObject protectedObject = this.children.stream().filter(p -> p.getData().equals(child)).findFirst().get();
+
+            return protectedObject;
+        }
+
         return childNode;
+    }
+
+    public ProtectedObject addChild(ProtectedObject protectedObject) {
+        this.children.add(protectedObject);
+
+        return protectedObject;
+    }
+
+    public ProtectedObject addChilds(ProtectedObject protectedObject) {
+        ProtectedObject cumulativeProtectedObject = protectedObject;
+
+        for (ProtectedObject childProtectedObjects: protectedObject.getChildren()) {
+            cumulativeProtectedObject = addChild(childProtectedObjects.getData());
+
+            cumulativeProtectedObject.addChilds(childProtectedObjects);
+        }
+
+        return cumulativeProtectedObject;
     }
 
     public List<String> generateListOfAllPathsToLeafs(ProtectedObject node, String accumulator) {
@@ -33,7 +62,7 @@ public class ProtectedObject {
             String elem = accumulator;
             elem += "/" + child.data;
 
-            if ((child.children != null) && (child.children.size() > 0)) {
+            if ((child.children != null) && (child.children.isEmpty())) {
                 generateListOfAllPathsToLeafs(child, elem);
             } else {
                 listOfStringsWithPathToAllLeafs.add(elem);
@@ -62,8 +91,14 @@ public class ProtectedObject {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProtectedObject that = (ProtectedObject) o;
-        return Objects.equals(data, that.data) &&
-                Objects.equals(children, that.children);
+        return Objects.equals(data, that.data);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = Objects.hash(data);
+
+        return hash;
     }
 }
 
