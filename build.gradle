@@ -42,6 +42,8 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.13.1'
     compileOnly 'org.projectlombok:lombok:1.18.6'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
+    // This common library contains in separate repo and must be included manually from that repo
+    compile files('libs/LicenseCommons-1.0-SNAPSHOT.jar')
 }
 
 processResources {

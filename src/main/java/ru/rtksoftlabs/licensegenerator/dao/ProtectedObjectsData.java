@@ -1,7 +1,7 @@
 package ru.rtksoftlabs.licensegenerator.dao;
 
 import reactor.core.publisher.Mono;
-import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
 
 import java.util.List;
 import java.util.Map;

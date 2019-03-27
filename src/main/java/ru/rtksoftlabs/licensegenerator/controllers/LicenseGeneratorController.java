@@ -5,13 +5,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import ru.rtksoftlabs.LicenseCommons.services.ProtectedObjectsService;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.util.License;
+import ru.rtksoftlabs.LicenseCommons.util.SignedLicenseContainer;
 import ru.rtksoftlabs.licensegenerator.services.LicenseService;
-import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
-import ru.rtksoftlabs.licensegenerator.services.ProtectedObjectsService;
-import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
-import ru.rtksoftlabs.licensegenerator.util.License;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
