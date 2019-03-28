@@ -1,4 +1,4 @@
-package ru.rtksoftlabs.licensegenerator.services;
+package ru.rtksoftlabs.licensegenerator.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +12,7 @@ import ru.rtksoftlabs.LicenseCommons.util.License;
 import ru.rtksoftlabs.LicenseCommons.util.SignedLicenseContainer;
 import ru.rtksoftlabs.licensegenerator.exceptions.GenerateLicenseException;
 import ru.rtksoftlabs.licensegenerator.exceptions.SignLicenseException;
+import ru.rtksoftlabs.licensegenerator.services.LicenseService;
 
 import java.io.*;
 import java.security.*;

@@ -8,7 +8,7 @@ import ru.rtksoftlabs.LicenseCommons.services.impl.FileServiceImpl;
 import ru.rtksoftlabs.LicenseCommons.services.impl.JsonMapperServiceImpl;
 import ru.rtksoftlabs.LicenseCommons.services.impl.SignatureServiceImpl;
 import ru.rtksoftlabs.LicenseCommons.services.impl.ZipLicenseServiceImpl;
-import ru.rtksoftlabs.licensegenerator.services.ProtectedObjectsServiceImpl;
+import ru.rtksoftlabs.licensegenerator.services.impl.ProtectedObjectsServiceImpl;
 
 @Configuration
 public class AppConfig {

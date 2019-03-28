@@ -1,4 +1,4 @@
-package ru.rtksoftlabs.licensegenerator.services;
+package ru.rtksoftlabs.licensegenerator.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
