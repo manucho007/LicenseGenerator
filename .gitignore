@@ -2,6 +2,7 @@
 /build/
 /logs/
 /libs/
+/bin/
 !gradle/wrapper/gradle-wrapper.jar
 *.lic
 *.sign
