@@ -1,10 +1,11 @@
 package ru.rtksoftlabs.licensegenerator.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
 import ru.rtksoftlabs.licensegenerator.config.ConfigUrlsForProtectedObjects;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@Slf4j
 public class ProtectedObjectsDataBase implements ProtectedObjectsData {
     @Autowired
     private WebClient webClient;
@@ -28,33 +30,19 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
 
     public void addToMap(String key, List<ProtectedObject> list) {
         if((!protectedObjects.containsKey(key)) || (!protectedObjects.get(key).equals(list))) {
-            System.out.println("protectedObjects.put");
             protectedObjects.put(key, list);
         }
     }
 
     public void processRequests(Map<String, Mono<List<ProtectedObject>>> requests) {
-        System.out.println("Before processRequests!");
-
         for (Map.Entry<String, Mono<List<ProtectedObject>>> request: requests.entrySet()) {
-            request.getValue().subscribe(p -> {
-                        System.out.println("Protected Objects in processRequests, source: " + request.getKey());
-
-                        for (ProtectedObject protectedObject: p){
-                            System.out.println(protectedObject);
-                        }
-
-                        addToMap(request.getKey(), p);
-                    },
+            request.getValue().subscribe(p -> addToMap(request.getKey(), p),
                     e -> {
-                        // TODO удалять из мапа protected objects?
-                        System.out.println("Exception in processRequests, source: " + request.getKey() + ", exception: " + e);
-                        //e.printStackTrace();
-                        throw new RuntimeException(e);
+                        protectedObjects.remove(request.getKey());
+
+                        log.error("Request to " + request.getKey() + ": " + request.getValue() + " failed", e);
                     });
         }
-
-        System.out.println("After processRequests!");
     }
 
     @Override

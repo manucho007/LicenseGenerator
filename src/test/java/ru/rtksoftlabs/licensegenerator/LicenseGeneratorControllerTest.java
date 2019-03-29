@@ -1,9 +1,5 @@
 package ru.rtksoftlabs.licensegenerator;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,14 +14,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.rtksoftlabs.licensegenerator.services.FileService;
+import ru.rtksoftlabs.LicenseCommons.services.FileService;
+import ru.rtksoftlabs.LicenseCommons.services.JsonMapperService;
+import ru.rtksoftlabs.LicenseCommons.services.ProtectedObjectsService;
+import ru.rtksoftlabs.LicenseCommons.services.SignatureService;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.util.Keys;
+import ru.rtksoftlabs.LicenseCommons.util.License;
+import ru.rtksoftlabs.LicenseCommons.util.SignedLicenseContainer;
 import ru.rtksoftlabs.licensegenerator.services.LicenseService;
-import ru.rtksoftlabs.licensegenerator.services.ProtectedObjectsService;
-import ru.rtksoftlabs.licensegenerator.services.SignatureService;
-import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
-import ru.rtksoftlabs.licensegenerator.util.Keys;
-import ru.rtksoftlabs.licensegenerator.util.License;
-import ru.rtksoftlabs.licensegenerator.util.SignedLicenseContainer;
 
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -56,6 +53,9 @@ public class LicenseGeneratorControllerTest {
     @Autowired
     private ProtectedObjectsService protectedObjectsService;
 
+    @Autowired
+    private JsonMapperService jsonMapperService;
+
     @MockBean
     private FileService fileService;
 
@@ -75,14 +75,7 @@ public class LicenseGeneratorControllerTest {
     public void getProtectedObjectsShouldReturnObjects() throws Exception {
         List<ProtectedObject> protectedObjects = license.getProtectedObjects();
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-
-        String content = mapper.writeValueAsString(protectedObjects);
+        String content = jsonMapperService.generateJson(protectedObjects);
 
         mockMvc.perform(get("/api/protected-objects")
                 .accept(MediaType.APPLICATION_JSON))
@@ -112,7 +105,7 @@ public class LicenseGeneratorControllerTest {
 
         SignedLicenseContainer signedLicenseContainer = licenseService.generateLicense(license);
 
-        mockMvc.perform(post("/api/generate-license").content(license.toJson()).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/generate-license").content(jsonMapperService.generateJson(license)).contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_OCTET_STREAM))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, allOf(startsWith("attachment; filename=license_"), endsWith(".zip"))))
                 .andExpect(content().bytes(signedLicenseContainer.getZip()))

@@ -1,5 +1,7 @@
 .gradle
 /build/
+/logs/
+/libs/
 !gradle/wrapper/gradle-wrapper.jar
 *.lic
 *.sign

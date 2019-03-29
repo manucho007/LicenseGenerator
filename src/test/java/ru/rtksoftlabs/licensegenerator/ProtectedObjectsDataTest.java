@@ -1,22 +1,20 @@
 package ru.rtksoftlabs.licensegenerator;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.netty.channel.ConnectTimeoutException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import ru.rtksoftlabs.LicenseCommons.services.JsonMapperService;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
 import ru.rtksoftlabs.licensegenerator.dao.ProtectedObjectsData;
-import ru.rtksoftlabs.licensegenerator.shared.ProtectedObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -31,6 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProtectedObjectsDataTest {
     @SpyBean
     private ProtectedObjectsData protectedObjectsData;
+
+    @Autowired
+    private JsonMapperService jsonMapperService;
 
     private List<MockWebServer> mockWebServerList;
 
@@ -88,11 +89,6 @@ public class ProtectedObjectsDataTest {
 
         int i = 0;
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
         List<List<ProtectedObject>> preparedContentList = new ArrayList<>();
 
         AtomicInteger sizeOfSuccessRequests = new AtomicInteger(monosList.size());
@@ -100,7 +96,7 @@ public class ProtectedObjectsDataTest {
         for (Map.Entry<String, Mono<List<ProtectedObject>>> result: monosList.entrySet()) {
             String preparedContent = prepareContent(i++);
 
-            List<ProtectedObject> expectedContent = mapper.readValue(preparedContent, new TypeReference<List<ProtectedObject>>(){});
+            List<ProtectedObject> expectedContent = jsonMapperService.generateListOfProtectedObjects(preparedContent);
 
             preparedContentList.add(expectedContent);
 
