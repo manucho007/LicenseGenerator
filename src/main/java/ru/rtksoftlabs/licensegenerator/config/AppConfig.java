@@ -3,6 +3,7 @@ package ru.rtksoftlabs.licensegenerator.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import ru.rtksoftlabs.LicenseCommons.services.*;
 import ru.rtksoftlabs.LicenseCommons.services.impl.FileServiceImpl;
 import ru.rtksoftlabs.LicenseCommons.services.impl.JsonMapperServiceImpl;
@@ -51,13 +52,22 @@ public class AppConfig {
     }
 
     @Bean
+    @Profile("!inno")
     public ProtectedObjectsService protectedObjectsService() {
         return new ProtectedObjectsServiceImpl();
     }
 
     @Bean
+    @Profile("inno")
+    public ProtectedObjectsService protectedObjectsServiceInno() {
+        return new ru.rtksoftlabs.LicenseCommons.inno.ProtectedObjectsServiceImpl();
+    }
+
+    @Bean
     public SignatureService signatureService() {
         SignatureServiceImpl signatureService = new SignatureServiceImpl();
+
+        signatureService.setFileService(fileService());
 
         signatureService.setKeyCertificateName(keyCertificateName);
         signatureService.setKeyStoreName(keyStoreName);
