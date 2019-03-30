@@ -1,51 +1,68 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   HttpClient,
   HttpHeaders,
   HttpErrorResponse
-} from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
-
+} from "@angular/common/http";
+import { Observable, of, throwError } from "rxjs";
+import { map, catchError, tap, retry } from "rxjs/operators";
 
 // Declaration of RESTful API endpoint and HTTP header
-const endpoint = 'http://localhost:8090/api/protected-objects';
+const getEndpoint = "api/protected-objects";
+const postEnpoint = "api/generate-license";
+
+// Http Options
 const httpOptions = {
   headers: new HttpHeaders({
-    'Content-Type': 'application/json'
+    "Content-Type": "application/json"
   })
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class RestService {
-  constructor(private http: HttpClient) {  }
+  constructor(private http: HttpClient) {}
 
-  // Function extracts the response
-  private extractData(res: Response) {
-    let body = res;
-    return body || { };
-  }
- 
-  // Function to GET the list of apps
-  getApps(): Observable<any> {
-    return this.http.get(endpoint + 'apps').pipe(
-      map(this.extractData));
+  // Function to get the objects
+  // HttpClient API get() method => Fetch Protected Objects
+  getObjects(): Observable<any> {
+    // return this.http.get<any>(getEndpoint)
+    return this.http.get<any>("api/protected-objects").pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
   }
 
-  // Function to handle errors
-  private handleError<T> (operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-  
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-  
-      // TODO: better job of transforming error for user consumption
-      console.log(`${operation} failed: ${error.message}`);
-  
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
+  // Function to generate the license
+  // HttpClient API post() method => Generate License
+  generateLicense(protectedObject): Observable<any> {
+    // return this.http.post<any>(postEnpoint, JSON.stringify(protectedObject),httpOptions)
+    return this.http
+      .post<any>(
+        "api/generate-license",
+        JSON.stringify(protectedObject),
+        httpOptions
+      )
+      .pipe(
+        retry(1),
+        catchError(this.handleError)
+      );
+  }
+
+  // Error handling
+  handleError(error) {
+    let errorMessage = "";
+    if (error.error instanceof ErrorEvent) {
+      // Get client-side error
+      errorMessage = error.error.message;
+    } else {
+      // Get server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    console.log(errorMessage);
+
+    // window.alert(errorMessage);
+    return throwError(errorMessage);
   }
 }
