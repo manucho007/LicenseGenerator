@@ -6,12 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.rtksoftlabs.LicenseCommons.services.ProtectedObjectsService;
-import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObjects;
 import ru.rtksoftlabs.LicenseCommons.util.License;
 import ru.rtksoftlabs.LicenseCommons.util.SignedLicenseContainer;
 import ru.rtksoftlabs.licensegenerator.services.LicenseService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -23,7 +21,7 @@ public class LicenseGeneratorController {
     private LicenseService licenseService;
 
     @GetMapping("/protected-objects")
-    public List<ProtectedObject> getProtectedObjects() {
+    public ProtectedObjects getProtectedObjects() {
         return protectedObjectsService.getProtectedObjects();
     }
 

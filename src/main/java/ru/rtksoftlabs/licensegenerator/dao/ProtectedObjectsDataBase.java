@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObjects;
 import ru.rtksoftlabs.licensegenerator.config.ConfigUrlsForProtectedObjects;
 
 import java.util.HashMap;
@@ -22,20 +23,20 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
     @Autowired
     private ConfigUrlsForProtectedObjects serverUrls;
 
-    private final ConcurrentMap<String, List<ProtectedObject>> protectedObjects;
+    private final ConcurrentMap<String, ProtectedObjects> protectedObjects;
 
     public ProtectedObjectsDataBase() {
         protectedObjects = new ConcurrentHashMap<>();
     }
 
-    public void addToMap(String key, List<ProtectedObject> list) {
-        if((!protectedObjects.containsKey(key)) || (!protectedObjects.get(key).equals(list))) {
-            protectedObjects.put(key, list);
+    public void addToMap(String key, ProtectedObjects protectedObjects) {
+        if((!this.protectedObjects.containsKey(key)) || (!this.protectedObjects.get(key).equals(protectedObjects))) {
+            this.protectedObjects.put(key, protectedObjects);
         }
     }
 
-    public void processRequests(Map<String, Mono<List<ProtectedObject>>> requests) {
-        for (Map.Entry<String, Mono<List<ProtectedObject>>> request: requests.entrySet()) {
+    public void processRequests(Map<String, Mono<ProtectedObjects>> requests) {
+        for (Map.Entry<String, Mono<ProtectedObjects>> request: requests.entrySet()) {
             request.getValue().subscribe(p -> addToMap(request.getKey(), p),
                     e -> {
                         protectedObjects.remove(request.getKey());
@@ -51,13 +52,13 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
     }
 
     @Override
-    public Map<String, Mono<List<ProtectedObject>>> getRequestList() {
+    public Map<String, Mono<ProtectedObjects>> getRequestList() {
         Map<String, String> servers = serverUrls.getServers();
 
-        Map<String, Mono<List<ProtectedObject>>> monosList = new HashMap<>();
+        Map<String, Mono<ProtectedObjects>> monosList = new HashMap<>();
 
         for (Map.Entry<String, String> entry: servers.entrySet()) {
-            Mono<List<ProtectedObject>> protectedObjectsMono = webClient.get().uri(entry.getValue()).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProtectedObject>>() {});
+            Mono<ProtectedObjects> protectedObjectsMono = webClient.get().uri(entry.getValue()).retrieve().bodyToMono(ProtectedObjects.class);
 
             monosList.put(entry.getKey(), protectedObjectsMono);
         }
@@ -65,7 +66,7 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
         return monosList;
     }
 
-    public Map<String, List<ProtectedObject>> getProtectedObjects() {
+    public Map<String, ProtectedObjects> getProtectedObjects() {
         return protectedObjects;
     }
 }

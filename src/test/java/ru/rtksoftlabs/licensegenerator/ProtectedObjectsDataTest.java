@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import ru.rtksoftlabs.LicenseCommons.services.JsonMapperService;
-import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObjects;
 import ru.rtksoftlabs.licensegenerator.dao.ProtectedObjectsData;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class ProtectedObjectsDataTest {
     }
 
     private String prepareContent(int appId) {
-        return "[{\"data\":\"App" + appId + "\",\"children\":[{\"data\":\"idComponent1\"},{\"data\":\"idComponent3\"},{\"data\": \"idComponent2\"}]},{\"data\":\"App2\",\"children\":[{\"data\":\"idComponent1\"},{\"data\":\"idComponent3\"},{\"data\":\"idComponent2\"}]}]";
+        return "{\"objects\":{\"TestApplication\":{\"data\":\"TestApplication\"},\"App" + appId + "\":{\"data\":\"App" + appId + "\",\"children\":[{\"data\":\"Scripts\",\"children\":[{\"data\":\"sc1\"},{\"data\":\"sc2\"},{\"data\":\"sc3\"}]},{\"data\":\"Roles\"}]}}}";
     }
 
     private void PrepareResponses(int count) throws IOException {
@@ -79,7 +79,7 @@ public class ProtectedObjectsDataTest {
 
     @Test
     public void getRequestListTest() throws IOException {
-        Map<String, Mono<List<ProtectedObject>>> monosList = protectedObjectsData.getRequestList();
+        Map<String, Mono<ProtectedObjects>> monosList = protectedObjectsData.getRequestList();
 
         monosList = new TreeMap<>(monosList);
 
@@ -89,14 +89,14 @@ public class ProtectedObjectsDataTest {
 
         int i = 0;
 
-        List<List<ProtectedObject>> preparedContentList = new ArrayList<>();
+        List<ProtectedObjects> preparedContentList = new ArrayList<>();
 
         AtomicInteger sizeOfSuccessRequests = new AtomicInteger(monosList.size());
 
-        for (Map.Entry<String, Mono<List<ProtectedObject>>> result: monosList.entrySet()) {
+        for (Map.Entry<String, Mono<ProtectedObjects>> result: monosList.entrySet()) {
             String preparedContent = prepareContent(i++);
 
-            List<ProtectedObject> expectedContent = jsonMapperService.generateListOfProtectedObjects(preparedContent);
+            ProtectedObjects expectedContent = jsonMapperService.generateProtectedObjects(preparedContent);
 
             preparedContentList.add(expectedContent);
 
@@ -114,7 +114,7 @@ public class ProtectedObjectsDataTest {
                 StepVerifier.create(result.getValue())
                         .consumeNextWith(
                                 responseContent -> {
-                                    assertThat(responseContent).usingFieldByFieldElementComparator().isEqualTo(expectedContent);
+                                    assertThat(responseContent).isEqualToComparingFieldByField(expectedContent);
 
                                     protectedObjectsData.addToMap(result.getKey(), responseContent);
                                 })
@@ -126,10 +126,10 @@ public class ProtectedObjectsDataTest {
 
         i = 0;
 
-        Map<String, List<ProtectedObject>> protectedObjects = new TreeMap<>(protectedObjectsData.getProtectedObjects());
+        Map<String, ProtectedObjects> protectedObjects = new TreeMap<>(protectedObjectsData.getProtectedObjects());
 
-        for (Map.Entry<String, List<ProtectedObject>> entry: protectedObjects.entrySet()) {
-            assertThat(entry.getValue()).usingFieldByFieldElementComparator().isEqualTo(preparedContentList.get(i++));
+        for (Map.Entry<String, ProtectedObjects> entry: protectedObjects.entrySet()) {
+            assertThat(entry.getValue()).isEqualToComparingFieldByField(preparedContentList.get(i++));
         }
     }
 }
