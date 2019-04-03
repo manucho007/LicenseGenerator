@@ -3,6 +3,8 @@ import { Routes, RouterModule } from "@angular/router";
 import { GeneratorComponent } from "./license/generator/generator.component";
 import { ViewerComponent } from "./license/viewer/viewer.component";
 import { CommonModule } from "@angular/common";
+import { FormsModule } from '@angular/forms'
+
 
 const routes: Routes = [
   { path: "generator", component: GeneratorComponent },
@@ -13,7 +15,8 @@ const routes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forRoot(routes), 
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
   exports: [RouterModule],
   declarations: [GeneratorComponent]
