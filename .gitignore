@@ -2,6 +2,7 @@
 /build/
 /logs/
 /libs/
+/bin/
 !gradle/wrapper/gradle-wrapper.jar
 *.lic
 *.sign
@@ -25,6 +26,9 @@
 *.iml
 *.ipr
 /out/
+
+### VSCODE ###
+/.vscode/
 
 ### NetBeans ###
 /nbproject/private/
