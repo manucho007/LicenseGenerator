@@ -3,7 +3,7 @@ import { Routes, RouterModule } from "@angular/router";
 import { GeneratorComponent } from "./license/generator/generator.component";
 import { ViewerComponent } from "./license/viewer/viewer.component";
 import { CommonModule } from "@angular/common";
-import { FormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 
 const routes: Routes = [
@@ -16,7 +16,8 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes), 
     CommonModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   exports: [RouterModule],
   declarations: [GeneratorComponent]
