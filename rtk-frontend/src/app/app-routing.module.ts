@@ -19,6 +19,6 @@ const routes: Routes = [
     FormsModule
   ],
   exports: [RouterModule],
-  declarations: [GeneratorComponent]
+  declarations: [GeneratorComponent, ViewerComponent]
 })
 export class AppRoutingModule {}

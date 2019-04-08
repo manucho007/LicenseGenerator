@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import {
   HttpClient,
   HttpHeaders,
-  HttpErrorResponse
+  HttpResponse
 } from "@angular/common/http";
 import { Observable, of, throwError } from "rxjs";
 import { map, catchError, tap, retry } from "rxjs/operators";
@@ -15,7 +15,9 @@ const postEnpoint = "api/generate-license";
 const httpOptions = {
   headers: new HttpHeaders({
     "Content-Type": "application/json"
-  })
+  }),
+  responseType: 'arraybuffer' as 'json',
+  observe: 'response' as 'body'
 };
 
 @Injectable({
@@ -36,12 +38,12 @@ export class RestService {
 
   // Function to generate the license
   // HttpClient API post() method => Generate License
-  generateLicense(protectedObject): Observable<any> {
+  generateLicense(protectedObjects): Observable<HttpResponse<any>> {
     // return this.http.post<any>(postEnpoint, JSON.stringify(protectedObject),httpOptions)
     return this.http
       .post<any>(
         "api/generate-license",
-        JSON.stringify(protectedObject),
+        JSON.stringify(protectedObjects),
         httpOptions
       )
       .pipe(

@@ -3,19 +3,26 @@
     <a class="navbar-brand" href="#">
       <img src="/assets/images/rtklogo2.png" width="213" height="41" alt="">
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-item nav-link active" href="#">Generator <span class="sr-only">(current)</span></a>
-          <a class="nav-item nav-link" href="#">Viewer</a>
+</nav>
+
+<div class="container-fluid p-2">
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <app-protected-objects #protectedObjects></app-protected-objects>
         </div>
-      </div>
-  </nav>
-
-<div class="container-fluid">
-  <router-outlet></router-outlet>
+        <div class="col-6 col-md-4">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <app-dates #dates></app-dates>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <app-actions [protectedObjects]="protectedObjects" [dates]="dates"></app-actions>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<tree-root class="reverse" [nodes]="nodes" [options]="options"></tree-root>
