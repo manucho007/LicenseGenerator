@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { RestService } from "src/app/services/rest.service";
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 
-import { ProtectedObject, childrenList, children } from "src/app/interfaces/protectedObjects";
+import { ProtectedObject } from "src/app/interfaces/protectedObjects";
 
 
 
@@ -30,17 +30,6 @@ export class GeneratorComponent implements OnInit {
     endDate: "",
     protectedObjects: [
     ]
-    //  [
-    //   {
-    //     data: "",
-    //     children: [
-    //       {
-    //         data: "",
-    //         children: [{ data: "" }]
-    //       }
-    //     ]
-    //   }
-    // ]
   };
 
   constructor(
@@ -90,14 +79,13 @@ export class GeneratorComponent implements OnInit {
       console.log(mydata[0].children[0].children);
 
       this.protectedObj = data;
-      // this.children = data[0].protectedObjects[0].data
-      //console.log(this.protectedObj);
+      console.log(this.protectedObj);
     });
   }
   // Function to post the license
   generateLicense() {
     // this.rest.generateLicense(licenseDoc);
-      console.log(this.licenseDoc);
+      // console.log(this.licenseDoc);
   }
 
 
