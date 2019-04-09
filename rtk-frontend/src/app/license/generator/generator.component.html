@@ -1,141 +1,158 @@
 <div class="jumbotron jumbotron-fluid">
-
   <div class="container">
     <h2 align="center">License Generator</h2>
-    <br>
-    <br>
+    <br />
+    <br />
     <div class="row">
-      <!-- col 1 -->
+    
+
+      <!-- COl 1 -->
       <div class="col-sm">
-        <div class="form-group row">
-          <div class="form-group row">
-            <label for="example-date-input" class="col-2 col-form-label">Initial Date</label>
-            <div class="col-10">
-              <input class="form-control" type="date" value="2011-08-19" id="example-date-input">
-            </div>
+        <!-- LIst of Apps -->
+        <div class="form-check parent p-2" *ngFor="let prot of protectedObj">
+          <input
+            [(ngModel)]="licenseDoc.protectedObjects"
+            class="form-check-input"
+            type="checkbox"
+            value="prot.data"
+            id="defaultCheck1"
+          />
+          <label class="form-check-label" for="defaultCheck1">
+            <p class="font-weight-bold">{{ prot.data }}</p>
+          </label>
+
+          <!-- List of children 1st level -->
+          <div class="form-check child" *ngFor="let chi of prot.children">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value=""
+              id="defaultCheck1"
+            />
+            <label class="form-check-label" for="defaultCheck1">
+              {{ chi.data }}
+            </label>
           </div>
         </div>
+      </div>
 
-        <div class="form-group row">
+        <!-- col 2 -->
+        <div class="col-sm">
           <div class="form-group row">
-            <label for="example-date-input" class="col-2 col-form-label">Expiration Date</label>
-            <div class="col-10">
-              <input class="form-control" type="date" value="2011-08-19" id="example-date-input">
+            <div class="form-group row">
+              <label for="example-date-input" class="col-2 col-form-label"
+                >Initial Date</label
+              >
+              <div class="col-10">
+                <input
+                  class="form-control"
+                  type="date"
+                  min="2019-01-01"
+                  max="2022-12-12"
+                  value="2019-01-01"
+                  id="example-date-input"
+                  [(ngModel)]="licenseDoc.beginDate"
+                />
+              </div>
             </div>
           </div>
+  
+          <div class="form-group row">
+            <div class="form-group row">
+              <label for="example-date-input" class="col-2 col-form-label"
+                >Expiration Date</label
+              >
+              <div class="col-10">
+                <input
+                  class="form-control"
+                  type="date"
+                  value="2019-08-19"
+                  min="2019-01-01"
+                  max="2022-12-12"
+                  value="2019-01-01"
+                  id="example-date-input"
+                  [(ngModel)]="licenseDoc.endDate"
+                />
+              </div>
+            </div>
+          </div>
+  
+          <!-- Button trigger modal -->
+          <button
+            type="button"
+            class="btn btn-success"
+            data-toggle="modal"
+            data-target="#exampleModal"
+            (click)="generateLicense()"
+          >
+            Generate License
+          </button>
+          <br />
+          <br />
+          <button type="button" class="btn btn-primary">Upload License</button>
         </div>
-
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
-          Generate License
-        </button>
-        <br>
-        <br>
-        <button type="button" class="btn btn-primary">Upload License</button>
-      </div>
-
-      <!-- COl 2 -->
-      <div class="col-sm">
-        <!-- app1 -->
-        <div class="form-check parent p-2">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            App1
-          </label>
-        </div>
-        <!-- child -->
-        <div class="form-check child ">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            Balancing
-          </label>
-        </div>
-
-        <hr>
-        <!-- App 2 -->
-        <div class="form-check parent p-2">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            App2
-          </label>
-        </div>
-        <!-- child -->
-        <div class="form-check child">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            Balancing
-          </label>
-        </div>
-        <div class="form-check child">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            Financing
-          </label>
-        </div>
-
-        <hr>
-        <!-- App 3 -->
-        <div class="form-check parent p-2">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            App3
-          </label>
-        </div>
-        <!-- child -->
-        <div class="form-check child">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            Balancing
-          </label>
-        </div>
-        <div class="form-check child">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">
-            Financing
-          </label>
-        </div>
-
-
-      </div>
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">License Generated</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <h5 class="modal-title" id="exampleModalLabel">
+              License Generated
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <strong>Initial Date:</strong> March 20th 2019
-            <br>
-            <strong>Expiration Date:</strong> March 20th 2020
-            <br>
-            <strong>App1:</strong> Balancing
-            <br>
-            <strong>App2:</strong> Balancing, Financing
-            <br>
-            <strong>App3:</strong> Financing
-            <br>
+            <strong>Initial Date:</strong> {{licenseDoc.beginDate}}
+            <br />
+            <strong>Expiration Date:</strong> {{licenseDoc.endDate}}
+            <br />
+            <div *ngFor="let doc of protectedObj">
+              <strong>{{doc.data}}</strong>
+              <div *ngFor="let docchi of doc.children">
+                  {{docchi.data}}
+              </div>
+            </div>
+            
+            <br />
+            
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-  </div>
-  <!-- 
-<form [formGroup]="form" (submit)="submit(form.value)">
-  <div *ngFor="let skill of skills.controls; let i=index">
-    <input type="checkbox" [formControl]="skill"/>{{user.skills[i].name}}
-  </div>
-  <button type="submit">Submit</button>
-</form>
+    <!-- <form [formGroup]="form" (ngSubmit)="submit()">
+      <label formArrayName="orders" *ngFor="let order of form.controls.orders.controls; let i = index">
+        <input type="checkbox" [formControlName]="i">
+        {{orders[i].name}}
+      </label>
+    
+      <button>submit</button>
+    </form> -->
 
-{{ form.value | json }} -->
+  </div>
+</div>
