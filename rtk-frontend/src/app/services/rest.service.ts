@@ -52,6 +52,19 @@ export class RestService {
       );
   }
 
+  updateList(): Observable<HttpResponse<any>> {
+    return this.http
+        .put<any>(
+            "api/update-protected-objects",
+            null,
+            {observe: 'response' as 'body'}
+        )
+        .pipe(
+            retry(1),
+            catchError(this.handleError)
+        );
+  }
+
   // Error handling
   handleError(error) {
     let errorMessage = "";

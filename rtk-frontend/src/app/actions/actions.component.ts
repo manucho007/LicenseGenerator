@@ -3,6 +3,7 @@ import {RestService} from "../services/rest.service";
 import {ProtectedObjectsComponent} from "../protected-objects/protected-objects.component";
 import {DatesComponent} from "../dates/dates.component";
 import * as FileSaver from "file-saver";
+import {BlockUI, NgBlockUI} from "ng-block-ui";
 
 @Component({
   selector: 'app-actions',
@@ -15,6 +16,8 @@ export class ActionsComponent implements OnInit {
 
   @Input() protectedObjects: ProtectedObjectsComponent;
   @Input() dates: DatesComponent;
+
+  @BlockUI() blockUI: NgBlockUI;
 
   ngOnInit() {}
 
@@ -159,6 +162,14 @@ export class ActionsComponent implements OnInit {
       const file = new File([data.body], fileName, {type: "application/zip"});
 
       FileSaver.saveAs(file);
+    });
+  }
+
+  onClickUpdate() {
+    this.blockUI.start('Loading...');
+
+    return this.rest.updateList().subscribe(data => {
+      this.blockUI.stop();
     });
   }
 }

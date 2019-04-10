@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import {HttpClientModule} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms'
 
@@ -10,6 +10,7 @@ import { TreeModule } from 'angular-tree-component';
 import { ProtectedObjectsComponent } from './protected-objects/protected-objects.component';
 import { DatesComponent } from './dates/dates.component';
 import { ActionsComponent } from './actions/actions.component';
+import {BlockUIModule} from "ng-block-ui";
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ActionsComponent } from './actions/actions.component';
     CommonModule,
     FormsModule,
     TreeModule.forRoot(),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BlockUIModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent],
