@@ -1,11 +1,13 @@
 package ru.rtksoftlabs.licensegenerator.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import ru.rtksoftlabs.LicenseCommons.services.JsonMapperService;
 import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
 import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObjects;
 import ru.rtksoftlabs.licensegenerator.config.ConfigUrlsForProtectedObjects;
@@ -28,6 +30,9 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
     @Autowired
     private ConfigUrlsForProtectedObjects serverUrls;
 
+    @Autowired
+    private JsonMapperService jsonMapperService;
+
     private final ConcurrentMap<String, ProtectedObjects> protectedObjects;
 
     public ProtectedObjectsDataBase() {
@@ -44,7 +49,18 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
         for (Map.Entry<String, Mono<ProtectedObjects>> request: requests.entrySet()) {
             request.getValue()
                     .timeout(Duration.ofMillis(readMonoTimeout))
-                    .subscribe(p -> addToMap(request.getKey(), p),
+                    .subscribe(p -> {
+                        try {
+                            addToMap(request.getKey(), p);
+                        }
+                        catch (RuntimeException e) {
+                            try {
+                                log.error("Error during addToMap, source: " + request.getKey() + ", response data in json: " + jsonMapperService.generateJson(p), e);
+                            } catch (JsonProcessingException ex) {
+                                log.error("Json processing error", ex);
+                            }
+                        }
+                    },
                     e -> {
                         protectedObjects.remove(request.getKey());
 
