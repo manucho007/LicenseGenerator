@@ -104,7 +104,7 @@ public class ProtectedObjectsDataTest {
                 StepVerifier.create(result.getValue())
                         .expectErrorSatisfies(throwable -> {
                                 assertThat(throwable).isInstanceOf(ConnectTimeoutException.class);
-                                assertThat(throwable.getMessage()).isEqualTo("connection timed out: /192.168.24.1:500");
+                                assertThat(throwable.getMessage()).isEqualTo("connection timed out: /1.2.3.4:500");
 
                                 sizeOfSuccessRequests.getAndDecrement();
                         })
