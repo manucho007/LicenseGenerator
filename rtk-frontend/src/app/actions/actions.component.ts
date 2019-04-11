@@ -150,8 +150,6 @@ export class ActionsComponent implements OnInit {
     postProtectedObjects["protectedObjects"] = {};
     postProtectedObjects["protectedObjects"]["objects"] = returnProtectedObjects;
 
-    console.log(JSON.stringify(postProtectedObjects));
-
     return this.rest.generateLicense(postProtectedObjects).subscribe(data => {
       const contentDispositionHeader = data.headers.get("content-disposition");
 
