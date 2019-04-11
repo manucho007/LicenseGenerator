@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("inno")
 public class ProtectedObjectsDataTest {
-    @SpyBean
+    @Autowired
     private ProtectedObjectsData protectedObjectsData;
 
     @Autowired
