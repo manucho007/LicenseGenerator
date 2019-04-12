@@ -8,9 +8,9 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  it('should display title message', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('Welcome to rtk-frontend!');
+    expect(page.getTitleText()).toEqual('Licensing service');
   });
 
   afterEach(async () => {

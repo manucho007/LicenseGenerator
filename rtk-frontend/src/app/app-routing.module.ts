@@ -20,6 +20,6 @@ const routes: Routes = [
     ReactiveFormsModule
   ],
   exports: [RouterModule],
-  declarations: [GeneratorComponent]
+  declarations: [GeneratorComponent, ViewerComponent]
 })
 export class AppRoutingModule {}

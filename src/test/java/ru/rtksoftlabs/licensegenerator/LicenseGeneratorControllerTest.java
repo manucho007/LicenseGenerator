@@ -18,7 +18,7 @@ import ru.rtksoftlabs.LicenseCommons.services.FileService;
 import ru.rtksoftlabs.LicenseCommons.services.JsonMapperService;
 import ru.rtksoftlabs.LicenseCommons.services.ProtectedObjectsService;
 import ru.rtksoftlabs.LicenseCommons.services.SignatureService;
-import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
+import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObjects;
 import ru.rtksoftlabs.LicenseCommons.util.Keys;
 import ru.rtksoftlabs.LicenseCommons.util.License;
 import ru.rtksoftlabs.LicenseCommons.util.SignedLicenseContainer;
@@ -28,7 +28,6 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,7 +72,7 @@ public class LicenseGeneratorControllerTest {
 
     @Test
     public void getProtectedObjectsShouldReturnObjects() throws Exception {
-        List<ProtectedObject> protectedObjects = license.getProtectedObjects();
+        ProtectedObjects protectedObjects = license.getProtectedObjects();
 
         String content = jsonMapperService.generateJson(protectedObjects);
 
