@@ -1,15 +1,29 @@
 package ru.rtksoftlabs.licensegenerator.config;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.tcp.TcpClient;
 import ru.rtksoftlabs.LicenseCommons.services.*;
 import ru.rtksoftlabs.LicenseCommons.services.impl.FileServiceImpl;
 import ru.rtksoftlabs.LicenseCommons.services.impl.JsonMapperServiceImpl;
 import ru.rtksoftlabs.LicenseCommons.services.impl.SignatureServiceImpl;
 import ru.rtksoftlabs.LicenseCommons.services.impl.ZipLicenseServiceImpl;
 import ru.rtksoftlabs.licensegenerator.services.impl.ProtectedObjectsServiceImpl;
+
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class AppConfig {
@@ -45,6 +59,35 @@ public class AppConfig {
 
     @Value("${key.certificate.validity.days}")
     private int keyCertificateValidityDays;
+
+    @Value("${webclient.connection.timeout}")
+    private int connectionTimeout;
+
+    @Value("${webclient.read.timeout}")
+    private int readTimeout;
+
+    @Bean
+    public WebClient webClient() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        mapper.setDefaultSetterInfo(JsonSetter.Value.forContentNulls(Nulls.SKIP));
+
+        ExchangeStrategies strategies = ExchangeStrategies
+                .builder()
+                .codecs(clientDefaultCodecsConfigurer -> {
+                    clientDefaultCodecsConfigurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON));
+
+                }).build();
+
+        TcpClient tcpClient = TcpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout)
+                .doOnConnected(connection ->
+                        connection.addHandlerLast(new ReadTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS)));
+
+        return WebClient.builder().exchangeStrategies(strategies)
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
+                .build();
+    }
 
     @Bean
     public JsonMapperService jsonMapperService() {
