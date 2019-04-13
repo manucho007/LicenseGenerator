@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import {BrowserModule, EventManager} from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
@@ -11,6 +11,7 @@ import { ProtectedObjectsComponent } from './protected-objects/protected-objects
 import { DatesComponent } from './dates/dates.component';
 import { ActionsComponent } from './actions/actions.component';
 import {BlockUIModule} from "ng-block-ui";
+import {CustomEventManager} from "./custom-event-manager";
 
 @NgModule({
   declarations: [
@@ -28,7 +29,7 @@ import {BlockUIModule} from "ng-block-ui";
     ReactiveFormsModule,
     BlockUIModule.forRoot()
   ],
-  providers: [],
+  providers: [{ provide: EventManager, useClass: CustomEventManager }],
   bootstrap: [AppComponent],
   exports: []
 })
