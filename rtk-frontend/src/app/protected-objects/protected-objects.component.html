@@ -1,1 +1,6 @@
-<tree-root class="reverse" [nodes]="nodes" [options]="options"></tree-root>
+<tree-root class="reverse" [nodes]="nodes" [options]="options">
+    <ng-template #treeNodeTemplate let-node>
+        <span *ngIf="node.data.name">{{ node.data.name }} ({{ node.data.data }})</span>
+        <span *ngIf="!node.data.name">{{ node.data.data }}</span>
+    </ng-template>
+</tree-root>
