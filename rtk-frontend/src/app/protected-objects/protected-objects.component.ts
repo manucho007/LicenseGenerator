@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {ITreeOptions, TreeComponent} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {RestService} from "../services/rest.service";
 
 @Component({
@@ -41,9 +41,50 @@ export class ProtectedObjectsComponent implements OnInit {
 
   nodes = [];
 
+  filterFn(value: string, treeModel: TreeModel) {
+    treeModel.filterNodes((node: TreeNode) => {
+      let dataWithName = "";
+
+      if (node.data.hasOwnProperty("name")) {
+        dataWithName = node.data.name + " (" + node.data.data + ")";
+      }
+      else {
+        dataWithName = node.data.data;
+      }
+
+      return fuzzysearch(value, dataWithName);
+    });
+  }
+
   options: ITreeOptions = {
     displayField: 'data',
     childrenField: 'children',
     useCheckbox: true
   };
+}
+
+function fuzzysearch (needle: string, haystack: string) {
+  const haystackLC = haystack.toLowerCase();
+  const needleLC = needle.toLowerCase();
+
+  const hlen = haystack.length;
+  const nlen = needleLC.length;
+
+  if (nlen > hlen) {
+    return false;
+  }
+  if (nlen === hlen) {
+    return needleLC === haystackLC;
+  }
+  outer: for (let i = 0, j = 0; i < nlen; i++) {
+    const nch = needleLC.charCodeAt(i);
+
+    while (j < hlen) {
+      if (haystackLC.charCodeAt(j++) === nch) {
+        continue outer;
+      }
+    }
+    return false;
+  }
+  return true;
 }

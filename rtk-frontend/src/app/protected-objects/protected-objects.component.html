@@ -1,6 +1,15 @@
-<tree-root class="reverse" [nodes]="nodes" [options]="options">
-    <ng-template #treeNodeTemplate let-node>
-        <span *ngIf="node.data.name">{{ node.data.name }} ({{ node.data.data }})</span>
-        <span *ngIf="!node.data.name">{{ node.data.data }}</span>
-    </ng-template>
-</tree-root>
+<form>
+    <div class="row form-group">
+        <div class="col-5">
+            <input type="text" class="form-control" id="filter" #filter (keyup)="filterFn(filter.value, tree.treeModel)" placeholder="filter nodes by fuzzy search"/>
+        </div>
+    </div>
+</form>
+<div class="bg-light" style="height: 600px;">
+    <tree-root #tree class="reverse" [focused]="true" [nodes]="nodes" [options]="options">
+        <ng-template #treeNodeTemplate let-node>
+            <span *ngIf="node.data.name">{{ node.data.name }} ({{ node.data.data }})</span>
+            <span *ngIf="!node.data.name">{{ node.data.data }}</span>
+        </ng-template>
+    </tree-root>
+</div>
