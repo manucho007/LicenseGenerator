@@ -4,17 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.rtksoftlabs.LicenseCommons.services.JsonMapperService;
-import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObject;
 import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObjects;
 import ru.rtksoftlabs.licensegenerator.config.ConfigUrlsForProtectedObjects;
 
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -67,11 +64,6 @@ public class ProtectedObjectsDataBase implements ProtectedObjectsData {
                         log.error("Request to " + request.getKey() + ": " + request.getValue() + " failed", e);
                     });
         }
-    }
-
-    @Override
-    public Mono<List<ProtectedObject>> getRequest(String server) {
-        return webClient.get().uri(server).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProtectedObject>>() {});
     }
 
     @Override

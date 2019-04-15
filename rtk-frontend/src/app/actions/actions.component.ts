@@ -36,6 +36,10 @@ export class ActionsComponent implements OnInit {
 
     protectedObject["data"] = leafObject["data"]["data"];
 
+    if (leafObject["data"].hasOwnProperty("name")) {
+      protectedObject["name"] = leafObject["data"]["name"];
+    }
+
     stack.push(protectedObject);
 
     if (leafObject.isRoot != true) {
@@ -70,7 +74,12 @@ export class ActionsComponent implements OnInit {
   addProtectedObject(protectedObject, object) {
     if (Array.isArray(protectedObject)) {
       if (!this.findProtectedObject(protectedObject, object)) {
-        protectedObject.push({"data": object["data"]});
+        if (object.hasOwnProperty("name")) {
+          protectedObject.push({"data": object["data"], "name": object["name"]});
+        }
+        else {
+          protectedObject.push({"data": object["data"]});
+        }
       }
 
       let i;
@@ -91,6 +100,12 @@ export class ActionsComponent implements OnInit {
       if (object.hasOwnProperty("data")) {
         if (!protectedObject.hasOwnProperty("data")) {
           protectedObject["data"] = object["data"];
+        }
+      }
+
+      if (object.hasOwnProperty("name")) {
+        if (!protectedObject.hasOwnProperty("name")) {
+          protectedObject["name"] = object["name"];
         }
       }
 
@@ -127,6 +142,10 @@ export class ActionsComponent implements OnInit {
 
   onClickGenerate() {
     let protectedObjects = this.protectedObjects.getTreeComponent().treeModel.selectedLeafNodes;
+
+    if (protectedObjects.length == 0) {
+      return;
+    }
 
     let returnProtectedObjects = {};
 
