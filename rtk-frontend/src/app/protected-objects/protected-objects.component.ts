@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {RestService} from "../services/rest.service";
+import { fromEvent } from 'rxjs';
+import {debounceTime} from "rxjs/operators";
 
 @Component({
   selector: 'app-protected-objects',
@@ -13,6 +15,14 @@ export class ProtectedObjectsComponent implements OnInit {
 
   ngOnInit() {
     this.loadObjects();
+
+    const el = document.getElementById('filter');
+
+    const keyUps = fromEvent(el, 'keyup');
+
+    const subscription = keyUps.pipe(debounceTime(500)).subscribe((evt: KeyboardEvent) => {
+      this.filterFn((<HTMLInputElement>evt.target).value, this.tree.treeModel);
+    });
   }
 
   loadObjects() {
@@ -59,7 +69,9 @@ export class ProtectedObjectsComponent implements OnInit {
   options: ITreeOptions = {
     displayField: 'data',
     childrenField: 'children',
-    useCheckbox: true
+    useCheckbox: true,
+    useVirtualScroll: true,
+    nodeHeight: 22
   };
 }
 
