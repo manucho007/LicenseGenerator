@@ -54,6 +54,13 @@ processResources {
 
 processResources.dependsOn('rtk-frontend:build')
 
+task copyToResouces(type: Copy) {
+    from "${project(':rtk-frontend').projectDir}/dist/${project(':rtk-frontend').name}"
+    into "${projectDir}/src/main/resources/static"
+}
+
+copyToResouces.dependsOn('rtk-frontend:build')
+
 bootRun {
     String activeProfile = System.properties['spring.profiles.active']
     systemProperty "spring.profiles.active", activeProfile

@@ -3,6 +3,7 @@
 /logs/
 /libs/
 /bin/
+/src/main/resources/static/
 !gradle/wrapper/gradle-wrapper.jar
 *.lic
 *.sign
