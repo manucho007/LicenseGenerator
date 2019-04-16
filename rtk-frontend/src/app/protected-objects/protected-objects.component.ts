@@ -1,8 +1,48 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+import { TREE_ACTIONS, IActionMapping } from 'angular-tree-component';
 import {RestService} from "../services/rest.service";
 import { fromEvent } from 'rxjs';
 import {debounceTime} from "rxjs/operators";
+
+function isAllowCheck(node) {
+  if (node.hasChildren) {
+    if (node.getVisibleChildren().length == 0) {
+      return false;
+    }
+    else {
+      const children = node.getVisibleChildren();
+
+      for (let i = 0; i < children.length; i++) {
+        if (isAllowCheck(children[i])) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+const actionMapping:IActionMapping = {
+  mouse: {
+    checkboxClick: (tree, node, $event) => {
+      if (!isAllowCheck(node)) {
+        $event.preventDefault();
+      }
+      else {
+        if (node.isSelected) {
+          TREE_ACTIONS.DESELECT(tree, node, $event);
+        }
+        else {
+          TREE_ACTIONS.SELECT(tree, node, $event);
+        }
+      }
+    }
+  }
+};
 
 @Component({
   selector: 'app-protected-objects',
@@ -71,7 +111,8 @@ export class ProtectedObjectsComponent implements OnInit {
     childrenField: 'children',
     useCheckbox: true,
     useVirtualScroll: true,
-    nodeHeight: 22
+    nodeHeight: 22,
+    actionMapping
   };
 }
 
