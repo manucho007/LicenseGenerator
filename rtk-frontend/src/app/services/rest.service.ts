@@ -56,8 +56,7 @@ export class RestService {
     return this.http
         .put<any>(
             "api/update-protected-objects",
-            null,
-            {observe: 'response' as 'body'}
+            null
         )
         .pipe(
             retry(1),

@@ -22,14 +22,14 @@ public class LicenseGeneratorController {
 
     @GetMapping("/protected-objects")
     public ProtectedObjects getProtectedObjects() {
-        return protectedObjectsService.getProtectedObjects();
+        return returnProtectedObjects();
     }
 
     @PutMapping("/update-protected-objects")
-    public ResponseEntity<Void> updateProtectedObjectsList() {
+    public ProtectedObjects updateProtectedObjectsList() {
         protectedObjectsService.updateProtectedObjects();
 
-        return ResponseEntity.ok().build();
+        return returnProtectedObjects();
     }
 
     @PostMapping("/generate-license")
@@ -37,6 +37,10 @@ public class LicenseGeneratorController {
         SignedLicenseContainer signedLicenseContainer = licenseService.generateLicense(license);
 
         return download(signedLicenseContainer);
+    }
+
+    private ProtectedObjects returnProtectedObjects() {
+        return protectedObjectsService.getProtectedObjects();
     }
 
     private ResponseEntity<byte[]> download(SignedLicenseContainer signedLicenseContainer) {

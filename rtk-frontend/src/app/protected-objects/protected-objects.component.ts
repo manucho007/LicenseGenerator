@@ -4,6 +4,8 @@ import { TREE_ACTIONS, IActionMapping } from 'angular-tree-component';
 import {RestService} from "../services/rest.service";
 import { fromEvent } from 'rxjs';
 import {debounceTime} from "rxjs/operators";
+import {ProtectedObjectsService} from "../services/protected-objects.service";
+import {TREE_EVENTS} from "angular-tree-component/dist/constants/events";
 
 function isAllowCheck(node) {
   if (node.hasChildren) {
@@ -11,10 +13,25 @@ function isAllowCheck(node) {
       return false;
     }
     else {
-      const children = node.getVisibleChildren();
+      const visibleChildren = node.getVisibleChildren();
 
-      for (let i = 0; i < children.length; i++) {
-        if (isAllowCheck(children[i])) {
+      // если хотя бы один checked есть в скрытых, то не разрешаем
+
+      if (node.isSelected) {
+        const children = node.children;
+
+        for (let i = 0; i < children.length; i++) {
+          if (children[i].isSelected && children[i].isHidden) {
+            return false;
+          }
+          else if (children[i].isSelected) {
+            return isAllowCheck(children[i]);
+          }
+        }
+      }
+
+      for (let i = 0; i < visibleChildren.length; i++) {
+        if (isAllowCheck(visibleChildren[i])) {
           return true;
         }
       }
@@ -51,7 +68,83 @@ const actionMapping:IActionMapping = {
 })
 export class ProtectedObjectsComponent implements OnInit {
 
-  constructor(private rest: RestService) {}
+  constructor(private rest: RestService, private protectedObjectService: ProtectedObjectsService) {
+    this.savedState = [];
+  }
+
+  private savedState;
+
+  @ViewChild(TreeComponent)
+  private tree: TreeComponent;
+
+  expandToLeaf(leafId, expandedNodeIds) {
+    const node = this.tree.treeModel.getNodeById(leafId);
+
+    this.getIdsFromLeafToRoot(node, expandedNodeIds);
+  }
+
+  getIdsFromLeafToRoot(node, expandedNodeIds) {
+    if ((node["parent"] != null) && (node.isRoot == null || !node.isRoot)) {
+      expandedNodeIds[node.parent.id] = true;
+
+      this.getIdsFromLeafToRoot(node.parent, expandedNodeIds);
+    }
+  }
+
+  processSavedState() {
+    let protectedObjects = this.getSavedState();
+
+    if (protectedObjects == null) {
+      return;
+    }
+
+    let returnProtectedObjectsList = [];
+
+    Object.keys(protectedObjects).map(function (objectKeyElement) {
+      const mapKeys = protectedObjects[objectKeyElement];
+
+      returnProtectedObjectsList.push(mapKeys);
+    });
+
+    let selectedLeafNodeIds = {};
+
+    let expandedNodeIds = {};
+
+    let activeNodeIds = {};
+
+    let hiddenNodeIds = {};
+
+    let focusedNodeId;
+
+    for (let i = 0; i < returnProtectedObjectsList.length; i++) {
+      let findedId = this.protectedObjectService.recursiveFindProtectedObject(returnProtectedObjectsList[i], this.tree.treeModel.nodes);
+
+      if (findedId != -1) {
+        selectedLeafNodeIds[findedId] = true;
+
+        this.expandToLeaf(findedId, expandedNodeIds);
+
+        this.tree.treeModel.setState({selectedLeafNodeIds,
+          expandedNodeIds,
+          activeNodeIds,
+          hiddenNodeIds,
+          focusedNodeId
+        });
+      }
+    }
+  }
+
+  public setSavedState(savedState) {
+    this.savedState = savedState;
+  }
+
+  public getSavedState() {
+    return this.savedState;
+  }
+
+  onUpdateData(event) {
+    this.processSavedState();
+  }
 
   ngOnInit() {
     this.loadObjects();
@@ -82,17 +175,52 @@ export class ProtectedObjectsComponent implements OnInit {
     });
   }
 
-  @ViewChild(TreeComponent)
-  private tree: TreeComponent;
-
   public getTreeComponent() {
     return this.tree;
   }
 
+  public getNodes() {
+    return this.nodes;
+  }
+
+  public clearNodes() {
+    this.nodes = [];
+  }
+
   nodes = [];
 
+  private _filterNode(ids, node, filterFn, autoShow) {
+    // if node passes function then it's visible
+    let isVisible = filterFn(node);
+
+    if (node.children && !isVisible) {
+      // if one of node's children passes filter then this node is also visible
+      node.children.forEach((child) => {
+        if (this._filterNode(ids, child, filterFn, autoShow)) {
+          isVisible = true;
+        }
+      });
+    }
+
+    // mark node as hidden
+    if (!isVisible) {
+      // if (node.isSelected) {
+      //   node.setIsSelected(false);
+      // }
+
+      ids[node.id] = true;
+    }
+    // auto expand parents to make sure the filtered nodes are visible
+    if (autoShow && isVisible) {
+      node.ensureVisible();
+    }
+    return isVisible;
+  }
+
   filterFn(value: string, treeModel: TreeModel) {
-    treeModel.filterNodes((node: TreeNode) => {
+    const ids = {};
+
+    this.tree.treeModel.roots.forEach((node) => this._filterNode(ids, node, (node: TreeNode) => {
       let dataWithName = "";
 
       if (node.data.hasOwnProperty("name")) {
@@ -103,7 +231,10 @@ export class ProtectedObjectsComponent implements OnInit {
       }
 
       return fuzzysearch(value, dataWithName);
-    });
+    }, true));
+
+    this.tree.treeModel.hiddenNodeIds = ids;
+    this.tree.treeModel.fireEvent({ eventName: TREE_EVENTS.changeFilter });
   }
 
   options: ITreeOptions = {
