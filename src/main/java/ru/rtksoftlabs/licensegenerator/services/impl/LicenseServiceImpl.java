@@ -88,4 +88,19 @@ public class LicenseServiceImpl implements LicenseService {
             throw new GenerateLicenseException("Generating license failed", e);
         }
     }
+
+    @Override
+    public License viewLicense(byte[] licenseBytes) throws IOException {
+        SignedLicenseContainer signedLicenseContainer = new SignedLicenseContainer();
+
+        signedLicenseContainer.setZip(licenseBytes);
+
+        zipLicenseService.unzipLicense(signedLicenseContainer);
+
+        String jsonString = new String(signedLicenseContainer.getLicense());
+
+        License license = jsonMapperService.generateLicense(jsonString);
+
+        return license;
+    }
 }

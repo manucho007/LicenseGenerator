@@ -11,13 +11,16 @@ import { ProtectedObjectsComponent } from './protected-objects/protected-objects
 import { DatesComponent } from './dates/dates.component';
 import { ActionsComponent } from './actions/actions.component';
 import {BlockUIModule} from "ng-block-ui";
+import {ModalDialogModule} from "ngx-modal-dialog";
+import { ViewLicenseComponent } from './view-license/view-license.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ProtectedObjectsComponent,
     DatesComponent,
-    ActionsComponent
+    ActionsComponent,
+    ViewLicenseComponent
   ],
   imports: [
     BrowserModule,
@@ -26,10 +29,12 @@ import {BlockUIModule} from "ng-block-ui";
     FormsModule,
     TreeModule.forRoot(),
     ReactiveFormsModule,
-    BlockUIModule.forRoot()
+    BlockUIModule.forRoot(),
+    ModalDialogModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent],
-  exports: []
+  exports: [],
+  entryComponents: [ViewLicenseComponent]
 })
 export class AppModule { }

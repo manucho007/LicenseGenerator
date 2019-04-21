@@ -1,10 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewContainerRef} from '@angular/core';
 import {RestService} from "../services/rest.service";
 import {ProtectedObjectsComponent} from "../protected-objects/protected-objects.component";
 import {DatesComponent} from "../dates/dates.component";
 import * as FileSaver from "file-saver";
 import {BlockUI, NgBlockUI} from "ng-block-ui";
 import {ProtectedObjectsService} from "../services/protected-objects.service";
+import {ModalDialogService} from "ngx-modal-dialog";
+import {ViewLicenseComponent} from "../view-license/view-license.component";
 
 @Component({
   selector: 'app-actions',
@@ -13,7 +15,7 @@ import {ProtectedObjectsService} from "../services/protected-objects.service";
 })
 export class ActionsComponent implements OnInit {
 
-  constructor(private rest: RestService, private protectedObjectService: ProtectedObjectsService) {}
+  constructor(private modalService: ModalDialogService, private viewRef: ViewContainerRef, private rest: RestService, private protectedObjectService: ProtectedObjectsService) {}
 
   @Input() protectedObjects: ProtectedObjectsComponent;
   @Input() dates: DatesComponent;
@@ -21,6 +23,25 @@ export class ActionsComponent implements OnInit {
   @BlockUI() blockUI: NgBlockUI;
 
   ngOnInit() {}
+
+  handleFileInput(event) {
+    let fileToUpload = event.target.files.item(0);
+
+    let formData:FormData = new FormData();
+    formData.append('uploadFile', fileToUpload, fileToUpload.name);
+
+    this.rest.viewLicense(formData).subscribe(data => {
+      this.modalService.openDialog(this.viewRef, {
+        title: 'View License - ' + fileToUpload.name,
+        childComponent: ViewLicenseComponent,
+        data: data,
+        settings: {
+          modalDialogClass: "modal-dialog modal-dialog-centered viewLicenseModalDialogClass",
+          contentClass: "modal-content viewLicenseContentClass"
+        }
+      });
+    });
+  }
 
   onClickGenerate() {
     let protectedObjects = this.protectedObjects.getTreeComponent().treeModel.selectedLeafNodes;

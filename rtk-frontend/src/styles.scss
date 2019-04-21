@@ -9,3 +9,30 @@
 .reverse .node-content-wrapper {
   order: 2;
 }
+
+.viewLicenseModalDialogClass {
+  max-width: 95vw;
+  width: 95vw;
+}
+
+.viewLicenseContentClass {
+  max-height: 95vh;
+  height: 95vh;
+}
+
+.formHeight {
+  height: 10%;
+}
+
+.treeDiv {
+  height: 90%;
+  position: relative;
+}
+
+.treeInner {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}

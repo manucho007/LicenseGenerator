@@ -5,11 +5,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import ru.rtksoftlabs.LicenseCommons.services.ProtectedObjectsService;
 import ru.rtksoftlabs.LicenseCommons.shared.ProtectedObjects;
 import ru.rtksoftlabs.LicenseCommons.util.License;
 import ru.rtksoftlabs.LicenseCommons.util.SignedLicenseContainer;
 import ru.rtksoftlabs.licensegenerator.services.LicenseService;
+
+import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -23,6 +28,17 @@ public class LicenseGeneratorController {
     @GetMapping("/protected-objects")
     public ProtectedObjects getProtectedObjects() {
         return returnProtectedObjects();
+    }
+
+    @PostMapping("/view-license")
+    public License viewLicense(MultipartHttpServletRequest request) throws IOException {
+        for (Map.Entry<String, MultipartFile> elem : request.getFileMap().entrySet()) {
+            if (elem.getValue().getOriginalFilename().endsWith(".zip")) {
+                return licenseService.viewLicense(elem.getValue().getBytes());
+            }
+        }
+
+        throw new RuntimeException("License view failed");
     }
 
     @PutMapping("/update-protected-objects")

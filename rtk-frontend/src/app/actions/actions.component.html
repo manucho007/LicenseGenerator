@@ -4,7 +4,8 @@
       <button (click)="onClickGenerate()" type="button" class="btn btn-primary">Generate License</button>
     </div>
     <div class="col">
-      <button type="button" class="btn btn-primary">View License</button>
+      <input hidden type="file" accept="application/zip" #file (change)="handleFileInput($event)">
+      <button type="button" class="btn btn-primary" (click)="file.click()">View License</button>
     </div>
     <div class="col">
       <button (click)="onClickUpdate()" type="button" class="btn btn-primary">Update List</button>

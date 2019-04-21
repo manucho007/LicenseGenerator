@@ -4,8 +4,8 @@ import {
   HttpHeaders,
   HttpResponse
 } from "@angular/common/http";
-import { Observable, of, throwError } from "rxjs";
-import { map, catchError, tap, retry } from "rxjs/operators";
+import { Observable, throwError } from "rxjs";
+import { catchError, retry } from "rxjs/operators";
 
 // Declaration of RESTful API endpoint and HTTP header
 const getEndpoint = "api/protected-objects";
@@ -57,6 +57,18 @@ export class RestService {
         .put<any>(
             "api/update-protected-objects",
             null
+        )
+        .pipe(
+            retry(1),
+            catchError(this.handleError)
+        );
+  }
+
+  viewLicense(licenseFormData): Observable<HttpResponse<any>> {
+    return this.http
+        .post<any>(
+            "api/view-license",
+            licenseFormData
         )
         .pipe(
             retry(1),
