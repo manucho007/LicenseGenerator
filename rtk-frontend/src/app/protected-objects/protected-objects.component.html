@@ -1,25 +1,31 @@
-<form>
-    <div class="row form-group">
-        <div class="col-5">
-            <input type="text" class="form-control" id="filter" placeholder="filter nodes by fuzzy search"/>
-        </div>
+<div class="container-fluid h-100">
+    <div class="row h-100">
         <div class="col">
-            <div class="btn-toolbar" role="toolbar">
-                <div class="btn-group mr-2" role="group">
-                    <button type="button" class="btn btn-light" (click)="tree.treeModel.expandAll()">Expand All</button>
+            <form style="height: 7%;">
+                <div class="row form-group">
+                    <div class="col-5">
+                        <input type="text" class="form-control" id="filter" placeholder="filter nodes by fuzzy search"/>
+                    </div>
+                    <div class="col">
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group mr-2" role="group">
+                                <button type="button" class="btn btn-light" (click)="tree.treeModel.expandAll()">Expand All</button>
+                            </div>
+                            <div class="btn-group mr-2" role="group">
+                                <button type="button" class="btn btn-light" (click)="tree.treeModel.collapseAll()">Collapse All</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="btn-group mr-2" role="group">
-                    <button type="button" class="btn btn-light" (click)="tree.treeModel.collapseAll()">Collapse All</button>
-                </div>
+            </form>
+            <div class="bg-light container-fluid" style="height: 93%; position: relative;">
+                <tree-root #tree class="reverse treeInner" [focused]="true" [nodes]="nodes" [options]="options" (updateData)="onUpdateData($event)">
+                    <ng-template #treeNodeTemplate let-node>
+                        <span *ngIf="node.data.name">{{ node.data.name }} ({{ node.data.data }})</span>
+                        <span *ngIf="!node.data.name">{{ node.data.data }}</span>
+                    </ng-template>
+                </tree-root>
             </div>
         </div>
     </div>
-</form>
-<div class="bg-light" style="height: 600px;">
-    <tree-root #tree class="reverse" [focused]="true" [nodes]="nodes" [options]="options" (updateData)="onUpdateData($event)">
-        <ng-template #treeNodeTemplate let-node>
-            <span *ngIf="node.data.name">{{ node.data.name }} ({{ node.data.data }})</span>
-            <span *ngIf="!node.data.name">{{ node.data.data }}</span>
-        </ng-template>
-    </tree-root>
 </div>
