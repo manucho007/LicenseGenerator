@@ -1,14 +1,12 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col">
-      <button (click)="onClickGenerate()" type="button" class="btn btn-primary">Generate License</button>
-    </div>
-    <div class="col">
-      <input hidden type="file" accept="application/zip" #file (change)="handleFileInput($event)">
-      <button type="button" class="btn btn-primary" (click)="file.click()">View License</button>
-    </div>
-    <div class="col">
-      <button (click)="onClickUpdate()" type="button" class="btn btn-primary">Update List</button>
-    </div>
+<div class="pt-2">
+  <div class="row pt-2">
+    <button (click)="onClickGenerate()" type="button" class="btn btn-primary w-100">Generate License</button>
+  </div>
+  <div class="row pt-2">
+    <input hidden type="file" accept="application/zip" #file (change)="handleFileInput($event)">
+    <button type="button" class="btn btn-primary w-100" (click)="file.click()">View License</button>
+  </div>
+  <div class="row pt-2">
+    <button (click)="onClickUpdate()" type="button" class="btn btn-primary w-100">Update List</button>
   </div>
 </div>

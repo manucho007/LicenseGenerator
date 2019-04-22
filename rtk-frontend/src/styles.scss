@@ -29,11 +29,11 @@
 }
 
 .formHeight {
-  height: 10%;
+  height: 45px;
 }
 
 .treeDiv {
-  height: 90%;
+  height: calc(100% - 45px);
   position: relative;
 }
 

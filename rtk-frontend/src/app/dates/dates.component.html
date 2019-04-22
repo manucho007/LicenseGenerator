@@ -1,14 +1,14 @@
 <form [formGroup]="datesForm">
-  <div class="form-group row">
-    <label for="beginDate" class="col-3 col-form-label">Begin date</label>
-    <div class="col-9">
-      <input formControlName="beginDate" class="form-control" type="date" value="2011-08-19" id="beginDate">
-    </div>
+  <div class="row">
+    Begin date
   </div>
-  <div class="form-group row">
-    <label for="endDate" class="col-3 col-form-label">End date</label>
-    <div class="col-9">
-      <input formControlName="endDate" class="form-control" type="date" value="2011-08-19" id="endDate">
-    </div>
+  <div class="row">
+      <input formControlName="beginDate" class="form-control" type="date" value="2011-08-19" id="beginDate">
+  </div>
+  <div class="row pt-2">
+    End date
+  </div>
+  <div class="row">
+    <input formControlName="endDate" class="form-control" type="date" value="2011-08-19" id="endDate">
   </div>
 </form>
